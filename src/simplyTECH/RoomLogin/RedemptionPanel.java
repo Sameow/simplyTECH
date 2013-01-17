@@ -75,6 +75,7 @@ public class RedemptionPanel extends JPanel {
 	 * 
 	 * @return void
 	 */
+	
 	private void initialize() {
 		String macAddress = null;
 		MACAddress mac = new MACAddress();
