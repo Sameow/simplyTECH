@@ -76,6 +76,8 @@ public class RedemptionPanel extends JPanel {
 	 * @return void
 	 */
 	private void initialize() {
+		System.out.println("SAASASASSs");
+		System.err.println("TESTING GITHUB");
 		String macAddress = null;
 		MACAddress mac = new MACAddress();
 		try {
@@ -203,7 +205,46 @@ public class RedemptionPanel extends JPanel {
 		}
 		return jTextPane;
 	}
-
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
 	/**
 	 * This method initializes jTextPaneTitle2	
 	 * 	
