@@ -205,7 +205,46 @@ public class RedemptionPanel extends JPanel {
 		}
 		return jTextPane;
 	}
-
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
+	//TESTING
 	/**
 	 * This method initializes jTextPaneTitle2	
 	 * 	
