@@ -20,11 +20,12 @@ public class Vouchers {
 		
 	}
 	
-	public Vouchers(int id, String title, String subtitle, String details){
+	public Vouchers(int id, String title, String subtitle, String details, String image){
 		this.id = id;
 		this.title = title;
 		this.subtitle = subtitle;
 		this.details = details;
+		this.image = image;
 	}
 	
 	public Vouchers(String username, String image, String title,

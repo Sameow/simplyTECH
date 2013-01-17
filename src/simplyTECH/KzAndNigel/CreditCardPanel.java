@@ -25,8 +25,10 @@ import simplyTECH.Components.DocumentSizeFilter;
 import simplyTECH.DatabaseStatements.DBController;
 import simplyTECH.RoomLogin.MyAccountsPanel;
 import simplyTECH.dao.CreditCardDAO;
+import simplyTECH.dao.CustomerDetailsDAO;
 import simplyTECH.dao.PersonDAO;
 import simplyTECH.entity.CreditCard;
+import simplyTECH.entity.CustomerDetails;
 import simplyTECH.entity.Person;
 
 import java.awt.event.ActionListener;
@@ -72,18 +74,47 @@ public class CreditCardPanel extends JPanel {
 	private JLabel label_5;
 	private JFormattedTextField formattedCardNumber4;
 	private JTextPane errorMessage;
+	private String loginName;
+	private String loginGender;
+	private String loginNRIC;
+	private String loginUsername;
+	private String loginPassword;
+	private String loginMobile;
+	private String loginAddress;
+	private String loginEmail;
+	private Person p1 = null;
+	private CustomerDetails cd = null;
+	private String membership = "Guest";
+	private double extraCharges = 0;
+	private int stay = 0;
+	private String checkout = "";
+	private int points = 0;
+	private int doNotDisturb = 0;
+	private String alarm = "";
+	
 	/**
 	 * This is the default constructor
 	 */
 	public CreditCardPanel() {
 		super();
-		initialize();
+		//initialize();
 	}
 
-	public CreditCardPanel(JFrame f){
+	public CreditCardPanel(JFrame f, String loginName, String loginGender, String loginNRIC, String loginUsername,
+			String loginPassword, String loginMobile, String loginAddress, String loginEmail){
 		this();
+		this.loginName = loginName;
+		this.loginGender = loginGender;
+		this.loginNRIC = loginNRIC;
+		this.loginUsername = loginUsername;
+		this.loginPassword = loginPassword;
+		this.loginMobile = loginMobile;
+		this.loginAddress = loginAddress;
+		this.loginEmail = loginEmail;
+		System.out.println("This is printing from setInformation method!");
+		System.out.println("Name is: " + name);
 		myFrame = f;
-	//	initialize();
+		initialize();
 	}
 	/**
 	 * This method initializes this
@@ -99,9 +130,12 @@ public class CreditCardPanel extends JPanel {
 		this.name = name;
 		this.password = password;
 		this.mobile = mobile;
+		System.out.println("This is printing from setInformation method!");
+		System.out.println("Name is: " + name);
 	}
 	
 	private void initialize() {
+		
 		System.out.println("Name from registerPanel is: " + name);
 		jLabelBack = new JLabel();
 		jLabelBack.setBounds(-13, -25, 170, 128);
@@ -410,11 +444,15 @@ public class CreditCardPanel extends JPanel {
 							&& checkCountry == true && checkCVC == true && checkStreetAddress == true){
 					try {
 						cc1 = new CreditCard(cardNumber,month,year,expiryDate,cardHolderName,country,CVC,streetAddress, cardType);
+						p1 = new Person(loginName,loginGender,loginNRIC,loginUsername,loginPassword,loginMobile,loginAddress,loginEmail,"Customer");
+						cd = new CustomerDetails(extraCharges,stay,membership,checkout,points,doNotDisturb,alarm);
 					} catch (SQLException e2) {
 						e2.printStackTrace();
 					}
 					try {
+						PersonDAO.createPerson(p1);
 						CreditCardDAO.createCreditCard(cc1);
+						CustomerDetailsDAO.createCustomer(cd);
 						int option = JOptionPane.showConfirmDialog(myFrame,
 								"Your account have been successfully updated!",
 								"Confirmation", JOptionPane.PLAIN_MESSAGE);

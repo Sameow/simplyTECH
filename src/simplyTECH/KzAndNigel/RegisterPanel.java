@@ -533,29 +533,21 @@ public class RegisterPanel extends JPanel {
 					int points = 0;
 					int doNotDisturb = 0;
 					String alarm = "";
+					JPanel panel1 = null;
 					
 					if (checkPassword == true && checkName == true && checkNRIC == true && checkUsername == true
 							&& checkAddress == true  && checkEmail == true){
-						CreditCardPanel ccp = new CreditCardPanel();
-						ccp.setInformation(name,password,mobile);
-						JPanel panel = new CreditCardPanel(myFrame);
+						//CreditCardPanel ccp = new CreditCardPanel();
+						//Pass the information to the next panel
+						CreditCardPanel panel = null;
+					//	panel.setInformation(name,password,mobile);
+						panel = new CreditCardPanel(myFrame, name, gender, NRIC, username, password, mobile, address, email);
 						myFrame.getContentPane().removeAll();
 						myFrame.getContentPane().add(panel);
 						myFrame.getContentPane().validate();
 						myFrame.getContentPane().repaint();
 						System.out.println("Entered");
-						
-						p1 = new Person(name,gender,NRIC,username,password,mobile,address,email,"Customer");
-						cd = new CustomerDetails(extraCharges,stay,membership,checkout,points,doNotDisturb,alarm);
-												
-						try {
-							PersonDAO.createPerson(p1);
-							CustomerDetailsDAO.createCustomer(cd);
-						} catch (SQLException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-						
+									
 					}
 					else {
 						jPasswordFieldRetypePassword.requestFocus();
