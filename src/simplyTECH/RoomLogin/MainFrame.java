@@ -18,7 +18,7 @@ public class MainFrame extends JFrame {
 			public void run() {
 				MainFrame thisClass = new MainFrame();
 				thisClass.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-				JPanel panel = new MyVouchersPanel2(thisClass);
+				JPanel panel = new PointsRewardSystemPanel2(thisClass);
 				thisClass.getContentPane().add(panel);
 				thisClass.setVisible(true);
 			}

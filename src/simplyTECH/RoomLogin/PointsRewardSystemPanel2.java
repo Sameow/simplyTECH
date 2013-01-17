@@ -17,8 +17,11 @@ import javax.swing.JList;
 import simplyTECH.Components.MACAddress;
 import simplyTECH.dao.CheckLoginDAO;
 import simplyTECH.dao.CustomerDetailsDAO;
+import simplyTECH.dao.PersonDAO;
 import simplyTECH.entity.CheckLogin;
 import simplyTECH.entity.CustomerDetails;
+import simplyTECH.entity.Person;
+
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.net.SocketException;
@@ -87,11 +90,12 @@ public class PointsRewardSystemPanel2 extends JPanel {
 		}
 		System.out.println("MacAddress: "+macAddress);
 		CheckLogin CL = CheckLoginDAO.searchByIdTi(macAddress);
-		//CL = 
 		String loginName = CL.getUsername();
-		//String loginName = "untoldlies";
 		CustomerDetails CD = new CustomerDetails();
-		CD = CustomerDetailsDAO.searchByUsername(loginName);
+		System.out.println("ASAS-->" + loginName);
+		Person person = PersonDAO.searchByUsername(loginName);
+		int id = person.getId();
+		CD = CustomerDetailsDAO.searchById(id);
 		int points = CD.getPoints();
 		jLabelBack = new JLabel();
 		jLabelBack.setText("");

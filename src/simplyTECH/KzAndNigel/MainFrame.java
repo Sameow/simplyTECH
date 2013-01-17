@@ -19,6 +19,8 @@ public class MainFrame extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private JPanel jContentPane = null;
 	private JFrame myFrame = null;
+	public static String name;
+	public static String id;
 	/**
 	 * @param args
 	 */

@@ -20,8 +20,10 @@ import simplyTECH.Components.MACAddress;
 import simplyTECH.DatabaseStatements.DBController;
 import simplyTECH.dao.CheckLoginDAO;
 import simplyTECH.dao.CustomerDetailsDAO;
+import simplyTECH.dao.PersonDAO;
 import simplyTECH.entity.CheckLogin;
 import simplyTECH.entity.CustomerDetails;
+import simplyTECH.entity.Person;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.ActionListener;
@@ -87,7 +89,10 @@ public class RedemptionPanel extends JPanel {
 		CL = CheckLoginDAO.searchByIdTi(macAddress);
 		String loginName = CL.getUsername();
 		CustomerDetails CD = new CustomerDetails();
-		CD = CustomerDetailsDAO.searchByUsername(loginName);
+		Person person = PersonDAO.searchByUsername(loginName);
+		int id = person.getId();
+		CD = CustomerDetailsDAO.searchById(id);
+		//CD = CustomerDetailsDAO.searchByUsername(loginName);
 		int points = CD.getPoints();
 		imagePath = "/simplyTECH/image/FoodVoucherLunchBig.png";
 		

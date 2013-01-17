@@ -1006,10 +1006,9 @@ public class MyAccountsPanel extends JPanel {
 					}
 					else {
 						option = JOptionPane.showConfirmDialog(myFrame,
-								errorMessageUsername.getText() + errorMessageMail.getText(),
-								//"Your account have been successfully updated!",
+								//errorMessageUsername.getText() + errorMessageMail.getText(),
+								"Your account have been successfully updated!",
 								"Confirmation", JOptionPane.PLAIN_MESSAGE);
-						
 					}
 					
 					
