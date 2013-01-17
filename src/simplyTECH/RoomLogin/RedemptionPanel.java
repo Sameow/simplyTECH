@@ -77,6 +77,7 @@ public class RedemptionPanel extends JPanel {
 	 */
 	private void initialize() {
 		System.out.println("SAASASASSs");
+		System.err.println("TESTING GITHUB");
 		String macAddress = null;
 		MACAddress mac = new MACAddress();
 		try {
