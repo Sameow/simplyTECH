@@ -5,6 +5,7 @@ public class RoomServices {
 	int id;
 	String username;
 	String service;
+	int roomServicesID;
 
 	public RoomServices() {
 
@@ -39,6 +40,14 @@ public class RoomServices {
 
 	public void setUsername(String username) {
 		this.username = username;
+	}
+
+	public int getRoomServicesID() {
+		return roomServicesID;
+	}
+
+	public void setRoomServicesID(int roomServicesID) {
+		this.roomServicesID = roomServicesID;
 	}
 
 }

@@ -17,6 +17,7 @@ import simplytech.entity.Person;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.net.SocketException;
+import java.util.Calendar;
 
 public class PointsRewardSystemPanel2 extends JPanel {
 
@@ -43,6 +44,10 @@ public class PointsRewardSystemPanel2 extends JPanel {
 	private JTextPane jTextPane211 = null;
 	private JTextPane jTextPaneDescription = null;
 	private String voucherType = null;
+	private Calendar calendar;
+	private long start;
+	private long stop;
+	private String previousPanel;
 
 	/**
 	 * This is the default constructor
@@ -52,9 +57,10 @@ public class PointsRewardSystemPanel2 extends JPanel {
 		initialize();
 	}
 
-	public PointsRewardSystemPanel2(JFrame f) {
-		this();
+	public PointsRewardSystemPanel2(JFrame f, String previousPanel) {
+		this.previousPanel = previousPanel;
 		myFrame = f;
+		initialize();
 	}
 
 	/**
@@ -70,12 +76,35 @@ public class PointsRewardSystemPanel2 extends JPanel {
 		jLabelBack.setIcon(new ImageIcon(getClass().getResource(
 				"/simplyTECH/image/Swap Left.png")));
 		jLabelBack.addMouseListener(new java.awt.event.MouseAdapter() {
-			public void mouseClicked(java.awt.event.MouseEvent e) {
-				JPanel panel = new Services(myFrame);
-				myFrame.getContentPane().removeAll();
-				myFrame.getContentPane().add(panel);
-				myFrame.getContentPane().validate();
-				myFrame.getContentPane().repaint();
+			public void mousePressed(MouseEvent e) {
+				start = calendar.getInstance().getTimeInMillis();
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent arg0) {
+				stop = calendar.getInstance().getTimeInMillis();
+				if (stop - start < 500) {
+					if (previousPanel.equals("Services")) {
+						JPanel panel = new Services(myFrame);
+						myFrame.getContentPane().removeAll();
+						myFrame.getContentPane().add(panel);
+						myFrame.getContentPane().validate();
+						myFrame.getContentPane().repaint();
+					} else {
+						JPanel panel = new MyAccountsPanel(myFrame);
+						myFrame.getContentPane().removeAll();
+						myFrame.getContentPane().add(panel);
+						myFrame.getContentPane().validate();
+						myFrame.getContentPane().repaint();
+					}
+
+				} else {
+					JPanel panel = new RoomHomePagePanel(myFrame);
+					myFrame.getContentPane().removeAll();
+					myFrame.getContentPane().add(panel);
+					myFrame.getContentPane().validate();
+					myFrame.getContentPane().repaint();
+				}
 			}
 		});
 
@@ -182,7 +211,7 @@ public class PointsRewardSystemPanel2 extends JPanel {
 		});
 		textPane.setBackground(new Color(227, 228, 250));
 		textPane.setBounds(557, 163, 330, 128);
-		//this.add(textPane);
+		// this.add(textPane);
 	}
 
 	/**

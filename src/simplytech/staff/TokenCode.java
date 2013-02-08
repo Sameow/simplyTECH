@@ -45,28 +45,23 @@ public class TokenCode extends JPanel {
 	private JPasswordField jPasswordFieldTokenCode = null;
 	private JFrame myFrame=null;
 	private JTextPane errorMessage;
-	private boolean creatingTokenCode;
-	private JLabel jLabelBack = null;
-	private static String tokenCode="";
-
+	private String tokenCode;
+	private JButton jButtonLogout = null;
 	/**
 	 * This is the default constructor
 	 */
 	public TokenCode() {
 		super();
-		tokenCode=createTokenCode();
 		initialize();
 	}
 
-	public TokenCode(JFrame f) {
+	public TokenCode(JFrame f, String tokenCode) {
 		this();
 		myFrame=f;
+		this.tokenCode=tokenCode;
 	}
-	/**
-	 * This method initializes this
-	 * 
-	 * @return void
-	 */
+	
+	
 	private void initialize() {
 		jLabelTokenCode = new JLabel();
 		jLabelTokenCode.setBounds(new Rectangle(63, 253, 207, 46));
@@ -88,7 +83,7 @@ public class TokenCode extends JPanel {
 		this.add(jLabelTokenCode, null);
 		this.add(getJPasswordFieldTokenCode(), null);
 		this.add(getErrorMessage());
-		this.add(getJLabelBack());
+		this.add(getJButtonLogout());
 	}
 	
 	private JTextPane getErrorMessage() {
@@ -99,14 +94,6 @@ public class TokenCode extends JPanel {
 			errorMessage.setFont(new Font("Calibri", Font.PLAIN, 14));
 			errorMessage.setBackground(new Color(227,228,250));
 			errorMessage.setBounds(708, 238, 135, 67);
-			System.out.println("creatingTokenCode = "+creatingTokenCode);
-			if (tokenCode=="") {
-				errorMessage.setForeground(Color.BLACK);
-				errorMessage.setText("Sending token code to email...");
-			}
-			else {
-				errorMessage.setText("Check email for token code.");
-			}
 		}
 		return errorMessage;
 	}
@@ -125,7 +112,7 @@ public class TokenCode extends JPanel {
 			jLabelCheckmate.setIcon(new ImageIcon(getClass().getResource("/simplytech/image/Checkmate.png")));
 			jLabelCheckmate.setText("");
 			jLabelStaffSignInPict = new JLabel();
-			jLabelStaffSignInPict.setBounds(new Rectangle(3, 1, 266, 216));
+			jLabelStaffSignInPict.setBounds(new Rectangle(0, 0, 266, 216));
 			jLabelStaffSignInPict.setIcon(new ImageIcon(getClass().getResource("/simplytech/image/StaffSignInImage.png")));
 			jLabelStaffSignInPict.setText("");
 			jLabelStaffSignIn = new JLabel();
@@ -173,11 +160,27 @@ public class TokenCode extends JPanel {
 		return jButtonLogin;
 	}
 
-	/**
-	 * This method initializes jPasswordFieldTokenCode	
-	 * 	
-	 * @return javax.swing.JPasswordField	
-	 */
+	private JButton getJButtonLogout() {
+		if (jButtonLogout == null) {
+			jButtonLogout = new JButton();
+			jButtonLogout.setBounds(new Rectangle(566, 316, 104, 46));
+			jButtonLogout.setFont(new Font("Dialog", Font.BOLD, 18));
+			jButtonLogout.setText("Logout");
+			jButtonLogout.setForeground(Color.white);
+			jButtonLogout.setBackground(new Color(91, 155, 213));
+			jButtonLogout.addActionListener(new java.awt.event.ActionListener() {
+				public void actionPerformed(java.awt.event.ActionEvent e) {
+					MainFrame.setPersonWhoLogin(null);
+					JPanel panel=new WelcomePanel(myFrame);
+					myFrame.getContentPane().removeAll();
+					myFrame.getContentPane().add(panel);
+					myFrame.getContentPane().validate();
+					myFrame.getContentPane().repaint();
+				}
+			});
+		}
+		return jButtonLogout;
+	}
 	private JPasswordField getJPasswordFieldTokenCode() {
 		if (jPasswordFieldTokenCode == null) {
 			jPasswordFieldTokenCode = new JPasswordField();
@@ -189,79 +192,7 @@ public class TokenCode extends JPanel {
 		return jPasswordFieldTokenCode;
 	}
 	
-	private JLabel getJLabelBack() {
-		if (jLabelBack == null) {
-			jLabelBack = new JLabel();
-			jLabelBack.setText("");
-			jLabelBack.setSize(new Dimension(128, 128));
-			jLabelBack.setLocation(new Point(-13, -25));
-			jLabelBack.setIcon(new ImageIcon(getClass().getResource(
-					"/simplyTECH/image/Swap Left.png")));
-			jLabelBack.addMouseListener(new java.awt.event.MouseAdapter() {
-				public void mouseClicked(java.awt.event.MouseEvent e) {
-					JPanel panel = new WelcomePanel(myFrame);
-					myFrame.getContentPane().removeAll();
-					myFrame.getContentPane().add(panel);
-					myFrame.getContentPane().validate();
-					myFrame.getContentPane().repaint();
-				}
-			});
-		}
-		return jLabelBack;
-	}
-	
-	public static String createTokenCode(){
-		//Generate token code
-		String newTokenCodeToBeInsertedToDB=Integer.toString(TokenCodeGenerator.newTokenCode());
-		System.out.println("String newTokenCodeToBeInsertedToDB = "+newTokenCodeToBeInsertedToDB);
-		//Encrypt it.
-		DesEncryption encrypter = new DesEncryption("Password");
-		String encrypted = encrypter.encrypt(newTokenCodeToBeInsertedToDB);
-		//Send email
-		boolean emailSent = sendEmail(MainFrame.getPersonWhoLogin().getEmail(), MainFrame.getPersonWhoLogin().getName(), newTokenCodeToBeInsertedToDB);
-		if (emailSent)
-			System.err.println("Email sent");
-		else
-			System.err.println("Email not sent");
-		return encrypted;
-	}
-	
-	public static boolean sendEmail(String recipientEmail, String recipientName, String newTokenCode) {
-		System.out.println("recipient Email = "+recipientEmail);
-		final String username = "simplytechcm@gmail.com";
-		final String password = "oopjpass";
-
-		Properties props = new Properties();
-		props.put("mail.smtp.auth", "true");
-		props.put("mail.smtp.starttls.enable", "true");
-		props.put("mail.smtp.host", "smtp.gmail.com");
-		props.put("mail.smtp.port", "587");
-
-		Session session = Session.getInstance(props,
-				new javax.mail.Authenticator() {
-					protected PasswordAuthentication getPasswordAuthentication() {
-						return new javax.mail.PasswordAuthentication(username, password);
-					}
-				});
-
-		try {
-
-			Message message = new MimeMessage(session);
-			message.setFrom(new InternetAddress(recipientEmail));
-			message.setRecipients(Message.RecipientType.TO,
-					InternetAddress.parse(recipientEmail));
-			message.setSubject("Token Code");
-			message.setText("Dear " + recipientName + ","
-					+ "\n\nYour token code is: " + newTokenCode
-					+ "\n\nRegards, \nSamuel Ong, \nHead of Security Department");
-			Transport.send(message);
-			return true;
-		} catch (MessagingException e) {
-			return false;
-		}
-	}
-	
-	public static boolean checkTokenCode(String userInputTokenCode){
+	public boolean checkTokenCode(String userInputTokenCode){
 		//Encrypt userInputTokenCode
 		DesEncryption encrypter = new DesEncryption("Password");
 		String encryptUserInputTokenCode = encrypter.encrypt(userInputTokenCode);

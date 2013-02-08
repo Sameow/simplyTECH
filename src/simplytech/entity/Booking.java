@@ -7,6 +7,7 @@ public class Booking {
 	String title;
 	double price;
 	int points;
+	int bookingID;
 
 	public Booking() {
 
@@ -60,6 +61,14 @@ public class Booking {
 
 	public void setPoints(int points) {
 		this.points = points;
+	}
+
+	public int getBookingID() {
+		return bookingID;
+	}
+
+	public void setBookingID(int bookingID) {
+		this.bookingID = bookingID;
 	}
 
 }

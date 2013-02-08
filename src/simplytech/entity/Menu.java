@@ -5,22 +5,21 @@ public class Menu {
 	int id;
 	String username;
 	int quantity;
-	String code;
 	String item;
 	double totalPrice;
 	int points;
+	int menuID;
 
 	public Menu() {
 
 	}
 
-	public Menu(int id, String username, int quantity, String code,
-			String item, double totalPrice, int points) {
+	public Menu(int id, String username, int quantity, String item,
+			double totalPrice, int points) {
 		super();
 		this.id = id;
 		this.username = username;
 		this.quantity = quantity;
-		this.code = code;
 		this.item = item;
 		this.totalPrice = totalPrice;
 		this.points = points;
@@ -50,14 +49,6 @@ public class Menu {
 		this.quantity = quantity;
 	}
 
-	public String getCode() {
-		return code;
-	}
-
-	public void setCode(String code) {
-		this.code = code;
-	}
-
 	public String getItem() {
 		return item;
 	}
@@ -80,6 +71,14 @@ public class Menu {
 
 	public void setPoints(int points) {
 		this.points = points;
+	}
+
+	public int getMenuID() {
+		return menuID;
+	}
+
+	public void setMenuID(int menuID) {
+		this.menuID = menuID;
 	}
 
 }

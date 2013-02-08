@@ -30,6 +30,30 @@ public class PersonDAO {
 		while (rs.next()) {
 			id = rs.getInt("MAX(ID)");
 		}
+		if (rs != null) {
+			try {
+				rs.close();
+			} catch (Exception e) {
+			}
+			rs = null;
+		}
+
+		if (stmt != null) {
+			try {
+				stmt.close();
+			} catch (Exception e) {
+			}
+			stmt = null;
+		}
+
+		if (currentCon != null) {
+			try {
+				currentCon.close();
+			} catch (Exception e) {
+			}
+
+			currentCon = null;
+		}
 		return id;
 	}
 
@@ -131,16 +155,46 @@ public class PersonDAO {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		finally {
+			if (rs != null) {
+				try {
+					rs.close();
+				} catch (Exception e) {
+				}
+				rs = null;
+			}
+
+			if (stmt != null) {
+				try {
+					stmt.close();
+				} catch (Exception e) {
+				}
+				stmt = null;
+			}
+
+			if (currentCon != null) {
+				try {
+					currentCon.close();
+				} catch (Exception e) {
+				}
+
+				currentCon = null;
+			}
+		}
+
 
 		return person;
 	}
-	
-	public static boolean updatePerson(Person person, String ID) throws SQLException {
+
+	public static boolean updatePerson(Person person, String ID)
+			throws SQLException {
 		boolean success = false;
 		DBController db = new DBController();
-		String dbQuery = "UPDATE person SET Username = '" + person.getUsername()
-				+ "', password = '" + person.getPassword() + "', mobile = '" + person.getMobile()
-				+ "', email = '" + person.getEmail() + "', address = '"+person.getAddress()+"' WHERE ID = '" + ID + "'";
+		String dbQuery = "UPDATE person SET Username = '"
+				+ person.getUsername() + "', password = '"
+				+ person.getPassword() + "', mobile = '" + person.getMobile()
+				+ "', email = '" + person.getEmail() + "', address = '"
+				+ person.getAddress() + "' WHERE ID = '" + ID + "'";
 
 		db.getConnection();
 
@@ -155,7 +209,8 @@ public class PersonDAO {
 			String username) throws SQLException {
 		boolean success = false;
 		DBController db = new DBController();
-		String dbQuery = "UPDATE person SET password = '" + inputPassword + "' WHERE username = '" + username + "'";
+		String dbQuery = "UPDATE person SET password = '" + inputPassword
+				+ "' WHERE username = '" + username + "'";
 
 		db.getConnection();
 

@@ -10,7 +10,6 @@ import java.sql.Statement;
 import simplytech.databasestatements.DBConnectionManager;
 import simplytech.entity.Booking;
 
-
 public class BookingDAO {
 
 	static Connection currentCon = null;
@@ -39,6 +38,7 @@ public class BookingDAO {
 				String title = rs.getString("title");
 				double price = rs.getDouble("price");
 				int points = rs.getInt("points");
+				int bookingID = rs.getInt(getMax());
 
 				booking = new Booking();
 				booking.setId(id2);
@@ -46,6 +46,7 @@ public class BookingDAO {
 				booking.setTitle(title);
 				booking.setPrice(price);
 				booking.setPoints(points);
+				booking.setBookingID(bookingID);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -74,6 +75,7 @@ public class BookingDAO {
 				String title = rs.getString("title");
 				double price = rs.getDouble("price");
 				int points = rs.getInt("points");
+				int bookingID = rs.getInt(getMax());
 
 				booking = new Booking();
 				booking.setId(id2);
@@ -81,6 +83,7 @@ public class BookingDAO {
 				booking.setTitle(title);
 				booking.setPrice(price);
 				booking.setPoints(points);
+				booking.setBookingID(bookingID);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -96,10 +99,10 @@ public class BookingDAO {
 				"jdbc:mysql://localhost:8888/simplytech", "simplyTECH",
 				"hahaudie");
 		stmt = con.createStatement();
-		String query = "SELECT MAX(BookingID) FROM booking";
+		String query = "SELECT MAX(bookingID) FROM booking";
 		ResultSet rs = stmt.executeQuery(query);
 		while (rs.next()) {
-			count = rs.getInt("MAX(BookingID)");
+			count = rs.getInt("MAX(bookingID)");
 		}
 		return count;
 	}
@@ -115,7 +118,7 @@ public class BookingDAO {
 			stmt = currentCon.createStatement();
 
 			// query for inserting into the table
-			String query = "insert into booking(title, price, points,username, id) values(?,?,?,?,?)";
+			String query = "insert into booking(title, price, points,username, id,bookingID) values(?,?,?,?,?,?)";
 			pstmt = currentCon.prepareStatement(query);
 
 			// inserting values
@@ -124,6 +127,7 @@ public class BookingDAO {
 			pstmt.setInt(3, b.getPoints());
 			pstmt.setString(4, b.getUsername());
 			pstmt.setInt(5, b.getId());
+			pstmt.setInt(6, b.getBookingID());
 			pstmt.executeUpdate();
 
 		} catch (Exception ex) {

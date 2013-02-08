@@ -118,7 +118,7 @@ public class MyAccountsPanel extends JPanel {
 	private boolean changeCreditCard = false;
 	private String newCardNumber;
 	private int newExpiryMonth;
-	private int newExpiryYear;
+	private String newExpiryYear;
 	private String newExpiryDate;
 	private String newCardHolderName;
 	private String newCountry;
@@ -157,10 +157,19 @@ public class MyAccountsPanel extends JPanel {
 	private String gender;
 	private String NRIC;
 	private int id;
+	private double extraCharges;
+	private int stay;
+	private String membership;
+	private String checkOut;
+	private int points;
+	private int doNotDisturb;
+	String alarm;
+	String roomNumber;
 	private String userType;
 	private String newPwd;
 	private boolean checkEmail = false;
 	private boolean checkUsernameFinal = false;
+
 	/**
 	 * This is the default constructor
 	 */
@@ -179,7 +188,9 @@ public class MyAccountsPanel extends JPanel {
 	 * 
 	 * @return void
 	 */
+
 	private void initialize() {
+
 		id = MainFrame.getPersonWhoLogin().getId();
 		username = MainFrame.getPersonWhoLogin().getUsername();
 		password = MainFrame.getPersonWhoLogin().getPassword();
@@ -190,14 +201,24 @@ public class MyAccountsPanel extends JPanel {
 		email = MainFrame.getPersonWhoLogin().getEmail();
 		address = MainFrame.getPersonWhoLogin().getAddress();
 		userType = MainFrame.getPersonWhoLogin().getUserType();
+		extraCharges = MainFrame.getPersonWhoLogin().getExtraCharges();
+		stay = MainFrame.getPersonWhoLogin().getStay();
+		membership = MainFrame.getPersonWhoLogin().getMembership();
+		checkOut = MainFrame.getPersonWhoLogin().getMembership();
+		points = MainFrame.getPersonWhoLogin().getPoints();
+		doNotDisturb = MainFrame.getPersonWhoLogin().getDoNotDisturb();
+		alarm = MainFrame.getPersonWhoLogin().getAlarm();
+		roomNumber = MainFrame.getPersonWhoLogin().getRoomNumber();
 		mobileString = mobile + "";
-		
-		CreditCard CC = CreditCardDAO.searchById(MainFrame.getPersonWhoLogin().getId());
+
+		CreditCard CC = CreditCardDAO.searchById(MainFrame.getPersonWhoLogin()
+				.getId());
 		cardType = CC.getCardType();
 		cardNumber = CC.getCardNumber();
 		jLabelBack = new JLabel();
 		jLabelBack.setBounds(new Rectangle(-13, -3, 130, 82));
-		jLabelBack.setIcon(new ImageIcon(getClass().getResource("/simplyTECH/image/Swap Left.png")));
+		jLabelBack.setIcon(new ImageIcon(getClass().getResource(
+				"/simplyTECH/image/Swap Left.png")));
 		jLabelBack.setText("");
 		jLabelBack.addMouseListener(new java.awt.event.MouseAdapter() {
 			public void mouseClicked(java.awt.event.MouseEvent e) {
@@ -225,11 +246,10 @@ public class MyAccountsPanel extends JPanel {
 		jLabelBtnCard.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				changeCreditCard = true;
 				frame2 = new JFrame("Change CreditCard");
 				frame2.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 				frame2.setLocationByPlatform(true);
-				frame2.setSize(400, 500);
+				frame2.setSize(700, 500);
 				frame2.setVisible(true);
 				frame2.getContentPane().setLayout(null);
 
@@ -311,9 +331,9 @@ public class MyAccountsPanel extends JPanel {
 				comboBoxYear = new JComboBox();
 				comboBoxYear.setBounds(259, 82, 62, 20);
 				comboBoxYear.setModel(new DefaultComboBoxModel(new String[] {
-						"Year", "2012", "2013", "2014", "2015", "2016", "2017",
-						"2018", "2010", "2021", "2022", "2023", "2024", "2025",
-						"2026", "2027", "2028", "2029", "2030" }));
+						"Year", "2013", "2014", "2015", "2016", "2017", "2018",
+						"2010", "2021", "2022", "2023", "2024", "2025", "2026",
+						"2027", "2028", "2029", "2030" }));
 				frame2.getContentPane().add(comboBoxYear);
 
 				try {
@@ -347,7 +367,7 @@ public class MyAccountsPanel extends JPanel {
 				errorMessageCC.setForeground(Color.RED);
 				errorMessageCC.setFont(new Font("Calibri", Font.PLAIN, 14));
 				errorMessageCC.setBackground(new Color(238, 238, 238));
-				errorMessageCC.setBounds(80, 304, 115, 66);
+				errorMessageCC.setBounds(400, 40, 515, 566);
 				// errorMessageCC.setText("ASDHIDOASDAS");
 				frame2.getContentPane().add(errorMessageCC);
 
@@ -359,10 +379,14 @@ public class MyAccountsPanel extends JPanel {
 				btnNewButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent arg0) {
 						errorMessageCC.setText("");
-						if (formattedTextFieldCardNumber1.equals("    ")
-								|| formattedTextFieldCardNumber2.equals("    ")
-								|| formattedTextFieldCardNumber3.equals("    ")
-								|| formattedTextFieldCardNumber4.equals("    ")) {
+						if (formattedTextFieldCardNumber1.getText().equals(
+								"    ")
+								|| formattedTextFieldCardNumber2.getText()
+										.equals("    ")
+								|| formattedTextFieldCardNumber3.getText()
+										.equals("    ")
+								|| formattedTextFieldCardNumber4.getText()
+										.equals("    ")) {
 							checkCardNumber = false;
 							errorMessageCC.setText(errorMessageCC.getText()
 									+ "*Card number must not be left blank. \n");
@@ -377,8 +401,12 @@ public class MyAccountsPanel extends JPanel {
 						String verifyCard = formattedTextFieldCardNumber1
 								.getText();
 						String stringfirstInt = verifyCard.charAt(0) + "";
-						int firstInt;
-						firstInt = Integer.parseInt(stringfirstInt);
+						int firstInt = 0;
+						try {
+							firstInt = Integer.parseInt(stringfirstInt);
+						} catch (NumberFormatException nFE) {
+
+						}
 						if (firstInt == 3) {
 							newCardType = "AMEX";
 						} else if (firstInt == 4) {
@@ -389,8 +417,12 @@ public class MyAccountsPanel extends JPanel {
 							newCardType = "OTHERS";
 						}
 						newExpiryMonth = comboBoxMonth.getSelectedIndex();
-						newExpiryYear = Integer.parseInt(comboBoxYear.getSelectedItem().toString());
-						int year;
+						try {
+							newExpiryYear = comboBoxYear.getSelectedItem()
+									.toString();
+						} catch (NumberFormatException nFE) {
+
+						}
 						int month;
 
 						switch (newExpiryMonth) {
@@ -433,67 +465,6 @@ public class MyAccountsPanel extends JPanel {
 						default:
 							month = 0;
 						}
-						switch (newExpiryYear) {
-						case 1:
-							year = 2012;
-							break;
-						case 2:
-							year = 2013;
-							break;
-						case 3:
-							year = 2014;
-							break;
-						case 4:
-							year = 2015;
-							break;
-						case 5:
-							year = 2016;
-							break;
-						case 6:
-							year = 2017;
-							break;
-						case 7:
-							year = 2018;
-							break;
-						case 8:
-							year = 2019;
-							break;
-						case 9:
-							year = 2020;
-							break;
-						case 10:
-							year = 2021;
-							break;
-						case 11:
-							year = 2022;
-							break;
-						case 12:
-							year = 2023;
-							break;
-						case 13:
-							year = 2024;
-							break;
-						case 14:
-							year = 2025;
-							break;
-						case 15:
-							year = 2026;
-							break;
-						case 16:
-							year = 2027;
-							break;
-						case 17:
-							year = 2028;
-							break;
-						case 18:
-							year = 2029;
-							break;
-						case 19:
-							year = 2030;
-							break;
-						default:
-							year = 0;
-						}
 						if (month == 0) {
 							checkNewMonth = false;
 							errorMessageCC.setText(errorMessageCC.getText()
@@ -501,14 +472,14 @@ public class MyAccountsPanel extends JPanel {
 						} else {
 							checkNewMonth = true;
 						}
-						if (year == 0) {
+						if (newExpiryYear.equals("Year")) {
 							checkNewYear = false;
 							errorMessageCC.setText(errorMessageCC.getText()
 									+ "*Year must not be empty.\n ");
 						} else {
 							checkNewYear = true;
 						}
-						newExpiryDate = month + " " + year;
+						newExpiryDate = month + " " + newExpiryYear;
 
 						if (formattedTextFieldCVC.getText().equals("   ")) {
 							checkCVC = false;
@@ -545,14 +516,17 @@ public class MyAccountsPanel extends JPanel {
 
 							updateCardNumber = newCardNumber;
 							updateExpiryMonth = newExpiryMonth;
-							updateExpiryYear = newExpiryYear;
+							updateExpiryYear = Integer.parseInt(newExpiryYear);
 							updateExpiryDate = newExpiryDate;
 							updateCardholderName = newCardHolderName;
 							updateCountry = newCountry;
 							updateCardType = newCardType;
 							updateCVC = newCVC;
+
 							updateStreetAddress = newStreetAddress;
+							changeCreditCard = true;
 							frame2.setVisible(false);
+
 						}
 
 					}
@@ -573,10 +547,9 @@ public class MyAccountsPanel extends JPanel {
 
 			}
 		});
-		if (cardType.equals("MASTERCARD")){
+		if (cardType.equals("MASTERCARD")) {
 			jLabelBtnCard.setBounds(new Rectangle(411, 321, 41, 16));
-		}
-		else {
+		} else {
 			jLabelBtnCard.setBounds(new Rectangle(361, 321, 41, 16));
 		}
 		jLabelBtnCard.setForeground(new Color(58, 115, 255));
@@ -640,7 +613,8 @@ public class MyAccountsPanel extends JPanel {
 						oldPassword = passwordFieldOldPassword.getText();
 						String passwordCheck1;
 						DesEncryption encryption = new DesEncryption("Password");
-						passwordCheck1 = encryption.decrypt(MainFrame.getPersonWhoLogin().getPassword());
+						passwordCheck1 = encryption.decrypt(MainFrame
+								.getPersonWhoLogin().getPassword());
 						if (passwordFieldOldPassword.getText().equals("")) {
 							errorMessagePW.setText(errorMessagePW.getText()
 									+ "*Old password must not be left blank. \n");
@@ -654,7 +628,8 @@ public class MyAccountsPanel extends JPanel {
 							}
 						}
 						newPassword = passwordFieldNewPassword.getText();
-						retypeNewPassword = passwordFieldRetypeNewPassword.getText();
+						retypeNewPassword = passwordFieldRetypeNewPassword
+								.getText();
 						if (passwordFieldNewPassword.getText().equals("")) {
 							errorMessagePW.setText(errorMessagePW.getText()
 									+ "*New password must not be left blank. \n");
@@ -709,7 +684,7 @@ public class MyAccountsPanel extends JPanel {
 		jLabelBtnPoints.setText("Redeem");
 		jLabelBtnPoints.addMouseListener(new java.awt.event.MouseAdapter() {
 			public void mouseClicked(java.awt.event.MouseEvent e) {
-				JPanel panel = new PointsRewardSystemPanel2(myFrame);
+				JPanel panel = new PointsRewardSystemPanel2(myFrame, "MyAccountsPanel");
 				myFrame.getContentPane().removeAll();
 				myFrame.getContentPane().add(panel);
 				myFrame.getContentPane().validate();
@@ -732,13 +707,14 @@ public class MyAccountsPanel extends JPanel {
 		jLabelCard = new JLabel();
 		jLabelCard.setText(cardType + " XXX-" + cardNumber.charAt(12)
 				+ cardNumber.charAt(13) + cardNumber.charAt(14)
+
 				+ cardNumber.charAt(15));
 		jLabelCard.setSize(new Dimension(202, 23));
 		jLabelCard.setLocation(new Point(210, 315));
 		jLabelCard.setForeground(new Color(120, 120, 120));
 		jLabelCard.setFont(new Font("Calibri", Font.PLAIN, 18));
 		jLabelPoints = new JLabel();
-		jLabelPoints.setText("2974");
+		jLabelPoints.setText(points + "");
 		jLabelPoints.setSize(new Dimension(67, 23));
 		jLabelPoints.setLocation(new Point(210, 169));
 		jLabelPoints.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -912,19 +888,23 @@ public class MyAccountsPanel extends JPanel {
 			jButtonDone = new JButton();
 			jButtonDone.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
-					
+
 					if (changeUsername == true) {
 						newUsername = textFieldUsername.getText();
 						if (textFieldUsername.getText().equals("")) {
-							errorMessageUsername.setText(errorMessageUsername.getText()+ "*Username must not be left blank. \n");
+							errorMessageUsername.setText(errorMessageUsername
+									.getText()
+									+ "*Username must not be left blank. \n");
 							checkUsername1 = false;
 						} else {
 							checkUsername1 = true;
 						}
-						Person person = PersonDAO.searchByUsername(textFieldUsername.getText());
+						Person person = PersonDAO
+								.searchByUsername(textFieldUsername.getText());
 						if (person != null) {
 							checkUsername2 = false;
-							errorMessageUsername.setText(errorMessageUsername.getText() + "*Username is in use. \n");
+							errorMessageUsername.setText(errorMessageUsername
+									.getText() + "*Username is in use. \n");
 						} else {
 							checkUsername2 = true;
 						}
@@ -946,10 +926,11 @@ public class MyAccountsPanel extends JPanel {
 						cc = new CreditCard(updateCardNumber,
 								updateExpiryMonth, updateExpiryYear,
 								updateExpiryDate, updateCardholderName,
-								updateCountry, updateCVC,
-								updateStreetAddress, updateCardType);
+								updateCountry, updateCVC, updateStreetAddress,
+								updateCardType);
 						try {
-							CreditCardDAO.updateCreditCard(cc, MainFrame.getPersonWhoLogin().getId());
+							CreditCardDAO.updateCreditCard(cc, MainFrame
+									.getPersonWhoLogin().getId());
 							JPanel panel = new MyAccountsPanel(myFrame);
 							myFrame.getContentPane().removeAll();
 							myFrame.getContentPane().add(panel);
@@ -977,47 +958,61 @@ public class MyAccountsPanel extends JPanel {
 
 					}
 					int option = 0;
-					if (changeUsername == true || changePassword == true || changeCreditCard == true || changeMobile == true || changeEmail == true){
-						/*if (changeUsername == true || changeEmail == true){
-						if (checkUsername1 == false || checkUsername2 == false || changeEmail == false) {
-						option = JOptionPane.showConfirmDialog(myFrame,
-								errorMessageUsername.getText()
-										+ errorMessageMail.getText(),
-								"Confirmation", JOptionPane.PLAIN_MESSAGE);
-						}
-						}
-					else {*/
-						if (changeUsername == true && checkUsernameFinal == false && changeEmail == true && checkEmail == false){
-							option = JOptionPane.showConfirmDialog(myFrame, "Your password and email did not meet the requirement.","Confirmation",JOptionPane.PLAIN_MESSAGE);
-						}
-						else if (changeUsername == true && checkUsername1 == false){
-							option = JOptionPane.showConfirmDialog(myFrame, "Your username must not be left empty.","Confirmation",JOptionPane.PLAIN_MESSAGE);
-						}
-						else if (changeUsername == true && checkUsername2 == false){
-							option = JOptionPane.showConfirmDialog(myFrame, "Username is in use.","Confirmation",JOptionPane.PLAIN_MESSAGE);
-						}			
-						else if (changeEmail == true && checkEmail == false){
-							option = JOptionPane.showConfirmDialog(myFrame, "Your email must not be left empty.","Confirmation",JOptionPane.PLAIN_MESSAGE);
-						}
-						else {
-						option = JOptionPane.showConfirmDialog(myFrame,
-								"Your account have been successfully updated!",
-								"Confirmation", JOptionPane.PLAIN_MESSAGE);
-						try {
-							Customer newCustomer = new Customer(id , name, gender, NRIC, username, password, mobile, email, address, userType);
-							PersonDAO.updatePerson(newCustomer, MainFrame.getPersonWhoLogin().getId()+"");
+					if (changeUsername == true || changePassword == true
+							|| changeCreditCard == true || changeMobile == true
+							|| changeEmail == true) {
+						/*
+						 * if (changeUsername == true || changeEmail == true){
+						 * if (checkUsername1 == false || checkUsername2 ==
+						 * false || changeEmail == false) { option =
+						 * JOptionPane.showConfirmDialog(myFrame,
+						 * errorMessageUsername.getText() +
+						 * errorMessageMail.getText(), "Confirmation",
+						 * JOptionPane.PLAIN_MESSAGE); } } else {
+						 */
+						if (changeUsername == true
+								&& checkUsernameFinal == false
+								&& changeEmail == true && checkEmail == false) {
+							option = JOptionPane
+									.showConfirmDialog(
+											myFrame,
+											"Your password and email did not meet the requirement.",
+											"Confirmation",
+											JOptionPane.PLAIN_MESSAGE);
+						} else if (changeUsername == true
+								&& checkUsername1 == false) {
+							option = JOptionPane.showConfirmDialog(myFrame,
+									"Your username must not be left empty.",
+									"Confirmation", JOptionPane.PLAIN_MESSAGE);
+						} else if (changeUsername == true
+								&& checkUsername2 == false) {
+							option = JOptionPane.showConfirmDialog(myFrame,
+									"Username is in use.", "Confirmation",
+									JOptionPane.PLAIN_MESSAGE);
+						} else if (changeEmail == true && checkEmail == false) {
+							option = JOptionPane.showConfirmDialog(myFrame,
+									"Your email must not be left empty.",
+									"Confirmation", JOptionPane.PLAIN_MESSAGE);
+						} else {
+							option = JOptionPane
+									.showConfirmDialog(
+											myFrame,
+											"Your account have been successfully updated!",
+											"Confirmation",
+											JOptionPane.PLAIN_MESSAGE);
+							Customer newCustomer = new Customer(id, name,
+									gender, NRIC, username, password, mobile,
+									email, address, userType, extraCharges,
+									stay, membership, checkOut, points,
+									doNotDisturb, alarm, roomNumber);
+							CustomerDAO.updateCustomer(newCustomer);
 							MainFrame.setPersonWhoLogin(newCustomer);
-						} catch (SQLException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+
 						}
-					//}
-					}
-					}
-					else {
+					} else {
 						option = JOptionPane.showConfirmDialog(myFrame,
-								"No changes were made.",
-								"Confirmation", JOptionPane.PLAIN_MESSAGE);
+								"No changes were made.", "Confirmation",
+								JOptionPane.PLAIN_MESSAGE);
 					}
 
 					if (option == JOptionPane.OK_OPTION) {
@@ -1082,7 +1077,8 @@ public class MyAccountsPanel extends JPanel {
 			jButtonMyVouchers
 					.addActionListener(new java.awt.event.ActionListener() {
 						public void actionPerformed(java.awt.event.ActionEvent e) {
-							JPanel panel = new MyVouchersPanel2(myFrame, "MyAccountsPanel", "");
+							JPanel panel = new MyVouchersPanel2(myFrame,
+									"MyAccountsPanel", "");
 							myFrame.getContentPane().removeAll();
 							myFrame.getContentPane().add(panel);
 							myFrame.getContentPane().validate();
@@ -1101,7 +1097,7 @@ public class MyAccountsPanel extends JPanel {
 	private JTextPane getJTextPaneUsername() {
 		if (jTextPaneUsername == null) {
 			jTextPaneUsername = new JTextPane();
-			jTextPaneUsername.setBounds(new Rectangle(210, 212, 86, 31));
+			jTextPaneUsername.setBounds(new Rectangle(210, 212, 137, 31));
 			jTextPaneUsername.setText(username);
 			jTextPaneUsername.setFont(new Font("Calibri", Font.PLAIN, 18));
 			jTextPaneUsername.setForeground(new Color(120, 120, 120));

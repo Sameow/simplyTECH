@@ -156,7 +156,7 @@ public class Services extends JPanel {
 			jButtonPointRewardSystem
 					.addActionListener(new java.awt.event.ActionListener() {
 						public void actionPerformed(java.awt.event.ActionEvent e) {
-							JPanel panel = new PointsRewardSystemPanel2(myFrame);
+							JPanel panel = new PointsRewardSystemPanel2(myFrame, "Services");
 							myFrame.getContentPane().removeAll();
 							myFrame.getContentPane().add(panel);
 							myFrame.getContentPane().validate();

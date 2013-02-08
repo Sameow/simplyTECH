@@ -151,7 +151,11 @@ public class LobbySuite extends JPanel {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					int option = JOptionPane.showConfirmDialog(myFrame,"Do You want to exit?","Confirmation", JOptionPane.YES_NO_OPTION);
 					if (option == JOptionPane.YES_OPTION){
-						System.exit(0);
+						JPanel panel = new LobbyLoginPanel(myFrame);
+						myFrame.getContentPane().removeAll();
+						myFrame.getContentPane().add(panel);
+						myFrame.getContentPane().validate();
+						myFrame.getContentPane().repaint();
 					}
 				}
 			});

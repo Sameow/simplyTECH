@@ -9,6 +9,8 @@ import java.awt.Color;
 import javax.swing.ImageIcon;
 import javax.swing.JTextPane;
 import java.awt.SystemColor;
+import java.awt.event.MouseEvent;
+import java.util.Calendar;
 
 import simplytech.dao.AccommodationsDAO;
 import simplytech.dao.BookingDAO;
@@ -40,6 +42,18 @@ public class Summary extends JPanel {
 	private String suite;
 	private double accoPrice;
 	private int accoDay;
+	private String membership;
+	private Calendar calendar;
+	private long start;
+	private long stop;
+
+	public double getGrandTotal() {
+		return grandTotal;
+	}
+
+	public void setGrandTotal(double grandTotal) {
+		this.grandTotal = grandTotal;
+	}
 
 	/**
 	 * This method initializes jTextPane
@@ -119,7 +133,16 @@ public class Summary extends JPanel {
 		suite = AccommodationsDAO.searchById(id + "").getAccoSuite();
 		accoPrice = AccommodationsDAO.searchById(id + "").getAccoPrice();
 		accoDay = AccommodationsDAO.searchById(id + "").getAccoDay();
+		membership = MainFrame.getPersonWhoLogin().getMembership();
 		grandTotal = menuPrice + bookingPrice + accoPrice;
+
+		if (membership == "Regular Membership") {
+			grandTotal = (menuPrice + bookingPrice + accoPrice) * 0.9;
+			setGrandTotal(grandTotal);
+		} else if (membership == "Exquisite Membership") {
+			grandTotal = (menuPrice + bookingPrice + accoPrice) * 0.8;
+			setGrandTotal(grandTotal);
+		}
 
 		jLabelBack = new JLabel();
 		jLabelBack.setBounds(-13, -25, 128, 128);
@@ -127,14 +150,24 @@ public class Summary extends JPanel {
 		jLabelBack.setIcon(new ImageIcon(Summary.class
 				.getResource("/simplytech/image/Swap Left.png")));
 		jLabelBack.addMouseListener(new java.awt.event.MouseAdapter() {
-			public void mouseClicked(java.awt.event.MouseEvent e) {
-				// System.out.println("mouseClicked()"); // TODO Auto-generated
-				// Event stub mouseClicked()
-				JPanel panel = new MyAccountsPanel(myFrame);
-				myFrame.getContentPane().removeAll();
-				myFrame.getContentPane().add(panel);
-				myFrame.getContentPane().validate();
-				myFrame.getContentPane().repaint();
+			public void mousePressed(MouseEvent e) {
+				start = calendar.getInstance().getTimeInMillis();
+			}
+			public void mouseReleased(MouseEvent arg0) {
+				stop = calendar.getInstance().getTimeInMillis();
+				if (stop - start < 500) {
+					JPanel panel = new MyAccountsPanel(myFrame);
+					myFrame.getContentPane().removeAll();
+					myFrame.getContentPane().add(panel);
+					myFrame.getContentPane().validate();
+					myFrame.getContentPane().repaint();
+				} else {
+					JPanel panel = new RoomHomePagePanel(myFrame);
+					myFrame.getContentPane().removeAll();
+					myFrame.getContentPane().add(panel);
+					myFrame.getContentPane().validate();
+					myFrame.getContentPane().repaint();
+				}
 			}
 		});
 		jLabelSummary = new JLabel();
@@ -272,4 +305,3 @@ public class Summary extends JPanel {
 		summaryPanel.add(lblGrandTotal);
 	}
 }
-

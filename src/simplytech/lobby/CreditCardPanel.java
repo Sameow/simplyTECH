@@ -15,6 +15,7 @@ import java.awt.event.KeyEvent;
 import javax.swing.SwingConstants;
 import javax.swing.JButton;
 
+import simplytech.dao.AlarmClockDAO;
 import simplytech.dao.CreditCardDAO;
 import simplytech.dao.CustomerDAO;
 
@@ -389,6 +390,7 @@ public class CreditCardPanel extends JPanel {
 							PersonDAO.createPerson(p1);
 							CreditCardDAO.createCreditCard(cc1);
 							CustomerDAO.createCustomer(cd);
+							AlarmClockDAO.createAlarm(p1);
 							int option = JOptionPane
 									.showConfirmDialog(
 											myFrame,

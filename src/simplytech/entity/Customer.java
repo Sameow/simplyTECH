@@ -22,6 +22,21 @@ public class Customer extends Person{
 		this.setId(id);
 		}
 	
+	public Customer(int id, String name,String gender,String NRIC, String username, String password,
+			String mobile, String email, String address, String userType, double extraCharges, int stay,
+			String membership, String checkOut, int points, int doNotDisturb, String alarm, String roomNumber){
+		super(id, name, gender, NRIC, username, password, mobile, email, address, userType);
+		this.ID = id;
+		this.extraCharges = extraCharges;
+		this.stay = stay;
+		this.membership = membership;
+		this.checkOut = checkOut;
+		this.points = points;
+		this.doNotDisturb = doNotDisturb;
+		this.alarm = alarm;
+		this.roomNumber = roomNumber;
+	}
+	
 	public Customer(double extraCharges, int stay,
 			String membership, String checkOut, int points, int doNotDisturb,
 			String alarm) {

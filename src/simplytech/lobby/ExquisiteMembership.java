@@ -166,7 +166,14 @@ public class ExquisiteMembership extends JPanel {
 							"Are you sure you want to redeem now?",
 							"Confirmation", JOptionPane.YES_NO_OPTION);
 					if (option == JOptionPane.YES_OPTION) {
-						if (MainFrame.getPersonWhoLogin().getPoints() >= points) {
+						if (MainFrame.getPersonWhoLogin().getMembership().equals("Exquisite")){
+							option1 = JOptionPane.showConfirmDialog(myFrame,
+									"Sorry but, you are already an Exquisite member of our hotel already.",
+									"Confirmation",
+									JOptionPane.PLAIN_MESSAGE);
+
+						}
+						else if (MainFrame.getPersonWhoLogin().getPoints() >= points) {
 							int newPoints = MainFrame.getPersonWhoLogin()
 									.getPoints() - points;
 							try {

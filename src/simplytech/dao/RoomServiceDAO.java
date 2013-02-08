@@ -10,7 +10,6 @@ import java.sql.Statement;
 import simplytech.databasestatements.DBConnectionManager;
 import simplytech.entity.RoomServices;
 
-
 public class RoomServiceDAO {
 
 	static Connection currentCon = null;
@@ -36,11 +35,13 @@ public class RoomServiceDAO {
 				int id2 = rs.getInt("id");
 				String username = rs.getString("username");
 				String service = rs.getString("service");
+				int roomServicesID = rs.getInt(getMax());
 
 				roomService = new RoomServices();
 				roomService.setId(id2);
 				roomService.setUsername(username);
 				roomService.setService(service);
+				roomService.setRoomServicesID(roomServicesID);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -67,11 +68,13 @@ public class RoomServiceDAO {
 				int id2 = rs.getInt("id");
 				String username = rs.getString("username");
 				String service = rs.getString("service");
+				int roomServicesID = rs.getInt(getMax());
 
 				roomService = new RoomServices();
 				roomService.setId(id2);
 				roomService.setUsername(username);
 				roomService.setService(service);
+				roomService.setRoomServicesID(roomServicesID);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -87,10 +90,10 @@ public class RoomServiceDAO {
 				"jdbc:mysql://localhost:8888/simplytech", "simplyTECH",
 				"hahaudie");
 		stmt = con.createStatement();
-		String query = "SELECT MAX(RoomServicesID) FROM roomservices";
+		String query = "SELECT MAX(roomServicesID) FROM roomservices";
 		ResultSet rs = stmt.executeQuery(query);
 		while (rs.next()) {
-			count = rs.getInt("MAX(RoomServicesID)");
+			count = rs.getInt("MAX(roomServicesID)");
 		}
 		return count;
 	}
@@ -106,13 +109,14 @@ public class RoomServiceDAO {
 			stmt = currentCon.createStatement();
 
 			// query for inserting into the table
-			String query = "insert into roomservices(service,username,id) values(?,?,?)";
+			String query = "insert into roomservices(service,username,id,roomServicesID) values(?,?,?,?)";
 			pstmt = currentCon.prepareStatement(query);
 
 			// inserting values
 			pstmt.setString(1, r.getService());
 			pstmt.setString(2, r.getUsername());
-			pstmt.setInt(3,r.getId());
+			pstmt.setInt(3, r.getId());
+			pstmt.setInt(4, r.getRoomServicesID());
 			pstmt.executeUpdate();
 
 		} catch (Exception ex) {

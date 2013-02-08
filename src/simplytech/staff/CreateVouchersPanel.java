@@ -110,6 +110,7 @@ public class CreateVouchersPanel extends JPanel {
 		this.add(getJTextPane1());
 
 		jTextPaneTitle = new JTextPane();
+		jTextPaneTitle.setEditable(false);
 		jTextPaneTitle.setBounds(new Rectangle(162, 172, 147, 35));
 		jTextPaneTitle.setText(newTitle);
 		// jTextPaneTitle.setBounds(new Rectangle(215, 210, 152, 60));
@@ -118,6 +119,7 @@ public class CreateVouchersPanel extends JPanel {
 		add(jTextPaneTitle);
 
 		jTextPaneSubtitle = new JTextPane();
+		jTextPaneSubtitle.setEditable(false);
 		jTextPaneSubtitle.setText(newSubtitle);
 		jTextPaneSubtitle.setBounds(new Rectangle(162, 208, 147, 73));
 		jTextPaneSubtitle.setBackground(new Color(227, 228, 250));
@@ -125,6 +127,7 @@ public class CreateVouchersPanel extends JPanel {
 		add(jTextPaneSubtitle);
 
 		jTextPaneDetails = new JTextPane();
+		jTextPaneDetails.setEditable(false);
 		jTextPaneDetails.setText(newDetails);
 		jTextPaneDetails.setBounds(45, 321, 264, 202);
 		jTextPaneDetails.setFont(new Font("Calibri", Font.PLAIN, 16));
@@ -252,6 +255,11 @@ public class CreateVouchersPanel extends JPanel {
 									newPointsRequired);
 							try {
 								VouchersDAO.createVoucher(voucher);
+								JPanel panel = new CreateVouchersPanel(myFrame);
+								myFrame.getContentPane().removeAll();
+								myFrame.getContentPane().add(panel);
+								myFrame.getContentPane().validate();
+								myFrame.getContentPane().repaint();
 							} catch (SQLException e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();

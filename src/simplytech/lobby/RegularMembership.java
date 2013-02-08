@@ -142,7 +142,20 @@ public class RegularMembership extends JPanel {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					int option = JOptionPane.showConfirmDialog(myFrame,"Are you sure you want to redeem now?","Confirmation", JOptionPane.YES_NO_OPTION);
 					if (option == JOptionPane.YES_OPTION){
-							if (MainFrame.getPersonWhoLogin().getPoints() >= points) {
+						if (MainFrame.getPersonWhoLogin().getMembership().equals("Regular")){
+							option1 = JOptionPane.showConfirmDialog(myFrame,
+									"Sorry but, you are already a regular member of our hotel already.",
+									"Confirmation",
+									JOptionPane.PLAIN_MESSAGE);
+						}
+						else if (MainFrame.getPersonWhoLogin().getMembership().equals("Exquisite")){
+							option1 = JOptionPane.showConfirmDialog(myFrame,
+									"Sorry but, customers cannot downgrade their membership.",
+									"Confirmation",
+									JOptionPane.PLAIN_MESSAGE);
+
+						}
+						else if (MainFrame.getPersonWhoLogin().getPoints() >= points) {
 								int newPoints = MainFrame.getPersonWhoLogin()
 										.getPoints() - points;
 								try {
@@ -165,7 +178,8 @@ public class RegularMembership extends JPanel {
 										"Congratulations! You are now a Regular member of our hotel!",
 										"Confirmation",
 										JOptionPane.PLAIN_MESSAGE);
-							}
+						}
+							
 							else
 								 		option1 = JOptionPane.showConfirmDialog(myFrame,
 										"Sorry but, you do not have enough points to redeem.",

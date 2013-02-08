@@ -10,5 +10,9 @@
 	<classpathentry kind="lib" path="lib/mysql-connector-java-5.1.22-bin.jar"/>
 	<classpathentry kind="lib" path="lib/pop3.jar"/>
 	<classpathentry kind="lib" path="lib/smtp.jar"/>
+	<classpathentry kind="lib" path="src/simplytech/lib/jcalendar-1.4.1.v201109071408.jar"/>
+	<classpathentry kind="lib" path="src/simplytech/lib/jgoodies-common-1.2.0.jar"/>
+	<classpathentry kind="lib" path="src/simplytech/lib/jgoodies-looks-2.4.1.jar"/>
+	<classpathentry kind="lib" path="src/simplytech/lib/junit-4.6.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

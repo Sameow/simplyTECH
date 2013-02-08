@@ -26,7 +26,6 @@ public class Person {
 	public Person(int id, String name,String gender,String NRIC, String username, String password,
 			String mobile, String email, String address, String userType) {
 		this.id = id;
-		System.out.println("Id in person is " + id);
 		this.name = name;
 		this.gender = gender;
 		this.NRIC = NRIC;

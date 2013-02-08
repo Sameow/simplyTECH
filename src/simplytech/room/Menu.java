@@ -19,7 +19,9 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
 import java.sql.SQLException;
+import java.util.Calendar;
 
 import javax.swing.ListSelectionModel;
 
@@ -65,7 +67,6 @@ public class Menu extends JPanel {
 	private JButton button_5;
 	private JButton button_6;
 	private int quantity;
-	private String code;
 	private String item;
 	private double price;
 	private double totalPrice;
@@ -76,7 +77,10 @@ public class Menu extends JPanel {
 	private double currentCharges;
 	private int finalPoints;
 	private double finalCharges;
-	
+	private Calendar calendar;
+	private long start;
+	private long stop;
+
 	/**
 	 * This is the default constructor
 	 */
@@ -115,14 +119,6 @@ public class Menu extends JPanel {
 		this.item = item;
 	}
 
-	public String getCode() {
-		return code;
-	}
-
-	public void setCode(String code) {
-		this.code = code;
-	}
-
 	public int getQuantity() {
 		return quantity;
 	}
@@ -150,7 +146,7 @@ public class Menu extends JPanel {
 		id = MainFrame.getPersonWhoLogin().getId();
 		currentCharges = MainFrame.getPersonWhoLogin().getExtraCharges();
 		currentPoints = MainFrame.getPersonWhoLogin().getPoints();
-		
+
 		jLabelBack = new JLabel();
 		jLabelBack.setText("");
 		jLabelBack.setLocation(new Point(-13, -25));
@@ -158,14 +154,24 @@ public class Menu extends JPanel {
 		jLabelBack.setIcon(new ImageIcon(Menu.class
 				.getResource("/simplytech/image/Swap Left.png")));
 		jLabelBack.addMouseListener(new java.awt.event.MouseAdapter() {
-			public void mouseClicked(java.awt.event.MouseEvent e) {
-				// System.out.println("mouseClicked()"); // TODO Auto-generated
-				// Event stub mouseClicked()
-				JPanel panel = new RoomServices(myFrame);
-				myFrame.getContentPane().removeAll();
-				myFrame.getContentPane().add(panel);
-				myFrame.getContentPane().validate();
-				myFrame.getContentPane().repaint();
+			public void mousePressed(MouseEvent e) {
+				start = calendar.getInstance().getTimeInMillis();
+			}
+			public void mouseReleased(MouseEvent arg0) {
+				stop = calendar.getInstance().getTimeInMillis();
+				if (stop - start < 500) {
+					JPanel panel = new RoomServices(myFrame);
+					myFrame.getContentPane().removeAll();
+					myFrame.getContentPane().add(panel);
+					myFrame.getContentPane().validate();
+					myFrame.getContentPane().repaint();
+				} else {
+					JPanel panel = new RoomHomePagePanel(myFrame);
+					myFrame.getContentPane().removeAll();
+					myFrame.getContentPane().add(panel);
+					myFrame.getContentPane().validate();
+					myFrame.getContentPane().repaint();
+				}
 			}
 		});
 		jLabelMenu = new JLabel();
@@ -206,17 +212,14 @@ public class Menu extends JPanel {
 					int col = table.getColumnCount();
 
 					for (int i = 0; i < col; i++) {
-							item = (String) table.getValueAt(row, i = 0);
-							setItem(item);
-							price = (Double) table.getValueAt(row, i = 1);
-							setPrice(price);
-							code = (String) table.getValueAt(row, i = 2);
-							setCode(code);
+						item = (String) table.getValueAt(row, i = 0);
+						setItem(item);
+						price = (Double) table.getValueAt(row, i = 1);
+						setPrice(price);
 					}
 
 					quantity = Integer.parseInt(JOptionPane.showInputDialog(
-							myFrame, "Quantity:", "" +
-									"Place order",
+							myFrame, "Quantity:", "" + "Place order",
 							JOptionPane.PLAIN_MESSAGE));
 					setQuantity(quantity);
 					totalPrice = price * quantity;
@@ -230,7 +233,6 @@ public class Menu extends JPanel {
 							"Place order", JOptionPane.OK_OPTION);
 
 					simplytech.entity.Menu menu = new simplytech.entity.Menu();
-					menu.setCode(code);
 					menu.setQuantity(quantity);
 					menu.setItem(item);
 					menu.setTotalPrice(totalPrice);
@@ -239,9 +241,12 @@ public class Menu extends JPanel {
 					menu.setId(id);
 					MenuDAO.save(menu);
 					try {
-						CustomerDAO.updateCharges(finalCharges, MainFrame.getPersonWhoLogin().getId());
-						CustomerDAO.updatePoints(finalPoints, MainFrame.getPersonWhoLogin().getId());
-						MainFrame.getPersonWhoLogin().setExtraCharges(finalCharges);
+						CustomerDAO.updateCharges(finalCharges, MainFrame
+								.getPersonWhoLogin().getId());
+						CustomerDAO.updatePoints(finalPoints, MainFrame
+								.getPersonWhoLogin().getId());
+						MainFrame.getPersonWhoLogin().setExtraCharges(
+								finalCharges);
 						MainFrame.getPersonWhoLogin().setPoints(finalPoints);
 					} catch (SQLException e) {
 						// TODO Auto-generated catchuunto block
@@ -300,29 +305,21 @@ public class Menu extends JPanel {
 			table_1 = new JTable();
 			table_1.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 			table_1.setModel(new DefaultTableModel(new Object[][] {
-					{ "Milk", new Double(1.95), "B1" },
-					{ "Hot Chocolate", new Double(1.95), "B2" },
-					{ "Coffee", new Double(1.95), "B3" },
-					{ "Lemonade", new Double(1.95), "B4" }, }, new String[] {
-					"Beverages", "Price (SGD$)", "Code" }) {
-				Class[] columnTypes = new Class[] { String.class, Double.class,
-						String.class };
+					{ "Milk", new Double(1.95) },
+					{ "Hot Chocolate", new Double(1.95) },
+					{ "Coffee", new Double(1.95) },
+					{ "Lemonade", new Double(1.95) }, }, new String[] {
+					"Beverages", "Price (SGD$)" }) {
+				Class[] columnTypes = new Class[] { String.class, Double.class };
 
 				public Class getColumnClass(int columnIndex) {
 					return columnTypes[columnIndex];
-				}
-
-				boolean[] columnEditables = new boolean[] { false, false, false };
-
-				public boolean isCellEditable(int row, int column) {
-					return columnEditables[column];
 				}
 			});
 			table_1.getColumnModel().getColumn(0).setResizable(false);
 			table_1.getColumnModel().getColumn(0).setPreferredWidth(100);
 			table_1.getColumnModel().getColumn(1).setResizable(false);
 			table_1.getColumnModel().getColumn(1).setPreferredWidth(30);
-			table_1.getColumnModel().getColumn(2).setResizable(false);
 			table_1.setRowHeight(50);
 			table_1.setFont(new Font("Calibri", Font.BOLD, 18));
 			table_1.setBorder(new LineBorder(new Color(0, 0, 0)));
@@ -343,8 +340,6 @@ public class Menu extends JPanel {
 						setItem(item);
 						price = (Double) table_1.getValueAt(row, i = 1);
 						setPrice(price);
-						code = (String) table_1.getValueAt(row, i = 2);
-						setCode(code);
 					}
 
 					quantity = Integer.parseInt(JOptionPane.showInputDialog(
@@ -362,7 +357,6 @@ public class Menu extends JPanel {
 							"Place order", JOptionPane.OK_OPTION);
 
 					simplytech.entity.Menu menu = new simplytech.entity.Menu();
-					menu.setCode(code);
 					menu.setQuantity(quantity);
 					menu.setItem(item);
 					menu.setTotalPrice(totalPrice);
@@ -371,15 +365,18 @@ public class Menu extends JPanel {
 					menu.setId(id);
 					MenuDAO.save(menu);
 					try {
-						CustomerDAO.updateCharges(finalCharges, MainFrame.getPersonWhoLogin().getId());
-						CustomerDAO.updatePoints(finalPoints, MainFrame.getPersonWhoLogin().getId());
-						MainFrame.getPersonWhoLogin().setExtraCharges(finalCharges);
+						CustomerDAO.updateCharges(finalCharges, MainFrame
+								.getPersonWhoLogin().getId());
+						CustomerDAO.updatePoints(finalPoints, MainFrame
+								.getPersonWhoLogin().getId());
+						MainFrame.getPersonWhoLogin().setExtraCharges(
+								finalCharges);
 						MainFrame.getPersonWhoLogin().setPoints(finalPoints);
 					} catch (SQLException e) {
 						// TODO Auto-generated catchuunto block
 						e.printStackTrace();
 					}
-					}
+				}
 			});
 			buttonOrder.setText("Place Order");
 			buttonOrder.setPreferredSize(new Dimension(92, 45));
@@ -430,29 +427,21 @@ public class Menu extends JPanel {
 			table.setFillsViewportHeight(true);
 			table.setBounds(60, 38, 756, 200);
 			table.setModel(new DefaultTableModel(new Object[][] {
-					{ "Plain Omelet", new Double(5.95), "A1" },
-					{ "Ham & Cheese Omelet", new Double(7.95), "A2" },
-					{ "Bacon & Cheese Omelet", new Double(7.95), "A3" },
-					{ "Sausage & Cheese Omelet", new Double(7.95), "A4" }, },
-					new String[] { "Omelets", "Price (SGD$)", "Code" }) {
-				Class[] columnTypes = new Class[] { String.class, Double.class,
-						String.class };
+					{ "Plain Omelet", new Double(5.95) },
+					{ "Ham & Cheese Omelet", new Double(7.95) },
+					{ "Bacon & Cheese Omelet", new Double(7.95) },
+					{ "Sausage & Cheese Omelet", new Double(7.95) }, },
+					new String[] { "Omelets", "Price (SGD$)" }) {
+				Class[] columnTypes = new Class[] { String.class, Double.class };
 
 				public Class getColumnClass(int columnIndex) {
 					return columnTypes[columnIndex];
-				}
-
-				boolean[] columnEditables = new boolean[] { false, false, false };
-
-				public boolean isCellEditable(int row, int column) {
-					return columnEditables[column];
 				}
 			});
 			table.getColumnModel().getColumn(0).setResizable(false);
 			table.getColumnModel().getColumn(0).setPreferredWidth(200);
 			table.getColumnModel().getColumn(1).setResizable(false);
 			table.getColumnModel().getColumn(1).setPreferredWidth(30);
-			table.getColumnModel().getColumn(2).setResizable(false);
 			table.setRowHeight(50);
 			table.setFont(new Font("Calibri", Font.BOLD, 18));
 			table.setBorder(new LineBorder(new Color(0, 0, 0)));
@@ -470,27 +459,17 @@ public class Menu extends JPanel {
 			table_2 = new JTable();
 			table_2.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 			table_2.setFont(new Font("Calibri", Font.BOLD, 18));
-			table_2.setModel(new DefaultTableModel(
-					new Object[][] {
-							{ "Steamed Vegetable", new Double(16.55), "C1" },
-							{ "Creamy White Asparagus Bisque",
-									new Double(9.55), "C2" },
-							{ "Charred Pesto Shrimp Skewer", new Double(15.99),
-									"C3" },
-							{ "Spicy Ahi Tuna ", new Double(14.25), "C4" },
-							{ "Onion Soup", new Double(12.55), "C5" }, },
-					new String[] { "Starter", "Price (SGD$)", "Code" }) {
-				Class[] columnTypes = new Class[] { String.class, Double.class,
-						String.class };
+			table_2.setModel(new DefaultTableModel(new Object[][] {
+					{ "Steamed Vegetable", new Double(16.55) },
+					{ "Creamy White Asparagus Bisque", new Double(9.55) },
+					{ "Charred Pesto Shrimp Skewer", new Double(15.99) },
+					{ "Spicy Ahi Tuna ", new Double(14.25) },
+					{ "Onion Soup", new Double(12.55) }, }, new String[] {
+					"Starter", "Price (SGD$)" }) {
+				Class[] columnTypes = new Class[] { String.class, Double.class };
 
 				public Class getColumnClass(int columnIndex) {
 					return columnTypes[columnIndex];
-				}
-
-				boolean[] columnEditables = new boolean[] { false, false, false };
-
-				public boolean isCellEditable(int row, int column) {
-					return columnEditables[column];
 				}
 			});
 			table_2.getColumnModel().getColumn(0).setResizable(false);
@@ -498,7 +477,6 @@ public class Menu extends JPanel {
 			table_2.getColumnModel().getColumn(0).setMinWidth(40);
 			table_2.getColumnModel().getColumn(1).setResizable(false);
 			table_2.getColumnModel().getColumn(1).setPreferredWidth(80);
-			table_2.getColumnModel().getColumn(2).setResizable(false);
 			table_2.setRowHeight(50);
 			table_2.setBorder(new LineBorder(new Color(0, 0, 0)));
 			table_2.setFillsViewportHeight(true);
@@ -514,28 +492,20 @@ public class Menu extends JPanel {
 			table_3 = new JTable();
 			table_3.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 			table_3.setModel(new DefaultTableModel(new Object[][] {
-					{ "CP Angus Burger", new Double(16.55), "D1" },
-					{ "\"Crowne\" Burger", new Double(17.65), "D2" },
-					{ "Elevator Burger", new Double(12.95), "D3" },
-					{ "Grilled Stick Sandwich", new Double(15.99), "D4" },
-					{ "Classical Falafel", new Double(14.25), "D5" }, },
-					new String[] { "Sandwiches", "Price (SGD$)", "Code" }) {
-				Class[] columnTypes = new Class[] { String.class, Double.class,
-						String.class };
+					{ "CP Angus Burger", new Double(16.55) },
+					{ "\"Crowne\" Burger", new Double(17.65) },
+					{ "Elevator Burger", new Double(12.95) },
+					{ "Grilled Stick Sandwich", new Double(15.99) },
+					{ "Classical Falafel", new Double(14.25) }, },
+					new String[] { "Sandwiches", "Price (SGD$)" }) {
+				Class[] columnTypes = new Class[] { String.class, Double.class };
 
 				public Class getColumnClass(int columnIndex) {
 					return columnTypes[columnIndex];
 				}
-
-				boolean[] columnEditables = new boolean[] { false, false, false };
-
-				public boolean isCellEditable(int row, int column) {
-					return columnEditables[column];
-				}
 			});
 			table_3.getColumnModel().getColumn(0).setResizable(false);
 			table_3.getColumnModel().getColumn(1).setResizable(false);
-			table_3.getColumnModel().getColumn(2).setResizable(false);
 			table_3.setRowHeight(50);
 			table_3.setFont(new Font("Calibri", Font.BOLD, 18));
 			table_3.setFillsViewportHeight(true);
@@ -560,28 +530,20 @@ public class Menu extends JPanel {
 			table_4 = new JTable();
 			table_4.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 			table_4.setModel(new DefaultTableModel(new Object[][] {
-					{ "Rainbow Chopped Salad", new Double(15.95), "E1" },
-					{ "Citrus French Bean Salad", new Double(12.55), "E2" },
-					{ "1605 Salad", new Double(14.85), "E3" },
-					{ "Caesar Salad", new Double(14.85), "E4" },
-					{ "Veal Culet Salad", new Double(16.95), "E5" }, },
-					new String[] { "Salads", "Price (SGD$)", "Code" }) {
-				Class[] columnTypes = new Class[] { String.class, Double.class,
-						String.class };
+					{ "Rainbow Chopped Salad", new Double(15.95) },
+					{ "Citrus French Bean Salad", new Double(12.55) },
+					{ "1605 Salad", new Double(14.85) },
+					{ "Caesar Salad", new Double(14.85) },
+					{ "Veal Culet Salad", new Double(16.95) }, }, new String[] {
+					"Salads", "Price (SGD$)" }) {
+				Class[] columnTypes = new Class[] { String.class, Double.class };
 
 				public Class getColumnClass(int columnIndex) {
 					return columnTypes[columnIndex];
 				}
-
-				boolean[] columnEditables = new boolean[] { false, false, false };
-
-				public boolean isCellEditable(int row, int column) {
-					return columnEditables[column];
-				}
 			});
 			table_4.getColumnModel().getColumn(0).setResizable(false);
 			table_4.getColumnModel().getColumn(1).setResizable(false);
-			table_4.getColumnModel().getColumn(2).setResizable(false);
 			table_4.setRowHeight(50);
 			table_4.setFont(new Font("Calibri", Font.BOLD, 18));
 			table_4.setFillsViewportHeight(true);
@@ -606,27 +568,19 @@ public class Menu extends JPanel {
 			table_5 = new JTable();
 			table_5.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 			table_5.setModel(new DefaultTableModel(new Object[][] {
-					{ "Pepperoni", new Double(16.55), "F1" },
-					{ "Italian", new Double(15.85), "F2" },
-					{ "Vegetarian", new Double(14.55), "F3" },
-					{ "Hawaiian", new Double(17.65), "F4" }, }, new String[] {
-					"Pizzas", "Price (SGD$)", "Code" }) {
-				Class[] columnTypes = new Class[] { String.class, Double.class,
-						String.class };
+					{ "Pepperoni", new Double(16.55) },
+					{ "Italian", new Double(15.85) },
+					{ "Vegetarian", new Double(14.55) },
+					{ "Hawaiian", new Double(17.65) }, }, new String[] {
+					"Pizzas", "Price (SGD$)" }) {
+				Class[] columnTypes = new Class[] { String.class, Double.class };
 
 				public Class getColumnClass(int columnIndex) {
 					return columnTypes[columnIndex];
 				}
-
-				boolean[] columnEditables = new boolean[] { false, false, false };
-
-				public boolean isCellEditable(int row, int column) {
-					return columnEditables[column];
-				}
 			});
 			table_5.getColumnModel().getColumn(0).setResizable(false);
 			table_5.getColumnModel().getColumn(1).setResizable(false);
-			table_5.getColumnModel().getColumn(2).setResizable(false);
 			table_5.setRowHeight(50);
 			table_5.setFont(new Font("Calibri", Font.BOLD, 18));
 			table_5.setFillsViewportHeight(true);
@@ -651,28 +605,20 @@ public class Menu extends JPanel {
 			table_6 = new JTable();
 			table_6.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 			table_6.setModel(new DefaultTableModel(new Object[][] {
-					{ "Seared Atlantic Salmon", new Double(24.65), "G1" },
-					{ "Jumbo Lump Crab Cakes", new Double(29.95), "G2" },
-					{ "Cajun Blackened Catfish", new Double(27.55), "G3" },
-					{ "Chicken & Waffles", new Double(23.45), "G4" },
-					{ "Steak Au Poivre", new Double(32.55), "G5" }, },
-					new String[] { "Entree", "Price (SGD$)", "Code" }) {
-				Class[] columnTypes = new Class[] { String.class, Double.class,
-						String.class };
+					{ "Seared Atlantic Salmon", new Double(24.65) },
+					{ "Jumbo Lump Crab Cakes", new Double(29.95) },
+					{ "Cajun Blackened Catfish", new Double(27.55) },
+					{ "Chicken & Waffles", new Double(23.45) },
+					{ "Steak Au Poivre", new Double(32.55) }, }, new String[] {
+					"Entree", "Price (SGD$)" }) {
+				Class[] columnTypes = new Class[] { String.class, Double.class };
 
 				public Class getColumnClass(int columnIndex) {
 					return columnTypes[columnIndex];
 				}
-
-				boolean[] columnEditables = new boolean[] { false, false, false };
-
-				public boolean isCellEditable(int row, int column) {
-					return columnEditables[column];
-				}
 			});
 			table_6.getColumnModel().getColumn(0).setResizable(false);
 			table_6.getColumnModel().getColumn(1).setResizable(false);
-			table_6.getColumnModel().getColumn(2).setResizable(false);
 			table_6.setRowHeight(50);
 			table_6.setFont(new Font("Calibri", Font.BOLD, 18));
 			table_6.setFillsViewportHeight(true);
@@ -696,35 +642,22 @@ public class Menu extends JPanel {
 		if (table_7 == null) {
 			table_7 = new JTable();
 			table_7.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-			table_7.setModel(new DefaultTableModel(
-					new Object[][] {
-							{ "Tea Poached Chicken Breast Salad",
-									new Double(16.25), "H1" },
-							{ "Chargrilled Asparagus", new Double(16.45), "H2" },
-							{ "Pigeon with Oyster Dressing", new Double(17.55),
-									"H3" },
-							{ "Crab with Pepper Fonfetti", new Double(17.85),
-									"H4" },
-							{ "Pistachio Praline Scallop", new Double(18.95),
-									"H5" }, }, new String[] { "New column",
-							"Price (SGD$)", "Code" }) {
-				Class[] columnTypes = new Class[] { String.class, Double.class,
-						String.class };
+			table_7.setModel(new DefaultTableModel(new Object[][] {
+					{ "Tea Poached Chicken Breast Salad", new Double(16.25) },
+					{ "Chargrilled Asparagus", new Double(16.45) },
+					{ "Pigeon with Oyster Dressing", new Double(17.55) },
+					{ "Crab with Pepper Fonfetti", new Double(17.85) },
+					{ "Pistachio Praline Scallop", new Double(18.95) }, },
+					new String[] { "New column", "Price (SGD$)" }) {
+				Class[] columnTypes = new Class[] { String.class, Double.class };
 
 				public Class getColumnClass(int columnIndex) {
 					return columnTypes[columnIndex];
-				}
-
-				boolean[] columnEditables = new boolean[] { false, false, false };
-
-				public boolean isCellEditable(int row, int column) {
-					return columnEditables[column];
 				}
 			});
 			table_7.getColumnModel().getColumn(0).setResizable(false);
 			table_7.getColumnModel().getColumn(0).setPreferredWidth(180);
 			table_7.getColumnModel().getColumn(1).setResizable(false);
-			table_7.getColumnModel().getColumn(2).setResizable(false);
 			table_7.setRowHeight(50);
 			table_7.setFont(new Font("Calibri", Font.BOLD, 18));
 			table_7.setFillsViewportHeight(true);
@@ -758,31 +691,21 @@ public class Menu extends JPanel {
 		if (table_8 == null) {
 			table_8 = new JTable();
 			table_8.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-			table_8.setModel(new DefaultTableModel(
-					new Object[][] {
-							{ "John Dory with Saffron Potato",
-									new Double(19.95), "I1" },
-							{ "Pancetta Lardons Duck", new Double(28.55), "I2" },
-							{ "Seared Supreme Chicken", new Double(19.55), "I3" },
-							{ "Sauce Vierged Lamb", new Double(17.85), "I4" },
-							{ "Foie Gras", new Double(25.65), "I5" }, },
-					new String[] { "Main Course", "Price (SGD$)", "Code" }) {
-				Class[] columnTypes = new Class[] { String.class, Double.class,
-						String.class };
+			table_8.setModel(new DefaultTableModel(new Object[][] {
+					{ "John Dory with Saffron Potato", new Double(19.95) },
+					{ "Pancetta Lardons Duck", new Double(28.55) },
+					{ "Seared Supreme Chicken", new Double(19.55) },
+					{ "Sauce Vierged Lamb", new Double(17.85) },
+					{ "Foie Gras", new Double(25.65) }, }, new String[] {
+					"Main Course", "Price (SGD$)" }) {
+				Class[] columnTypes = new Class[] { String.class, Double.class };
 
 				public Class getColumnClass(int columnIndex) {
 					return columnTypes[columnIndex];
 				}
-
-				boolean[] columnEditables = new boolean[] { false, false, false };
-
-				public boolean isCellEditable(int row, int column) {
-					return columnEditables[column];
-				}
 			});
 			table_8.getColumnModel().getColumn(0).setResizable(false);
 			table_8.getColumnModel().getColumn(1).setResizable(false);
-			table_8.getColumnModel().getColumn(2).setResizable(false);
 			table_8.setRowHeight(50);
 			table_8.setFont(new Font("Calibri", Font.BOLD, 18));
 			table_8.setFillsViewportHeight(true);
@@ -797,27 +720,19 @@ public class Menu extends JPanel {
 			table_9 = new JTable();
 			table_9.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 			table_9.setModel(new DefaultTableModel(new Object[][] {
-					{ "Pistachio Biscotti", new Double(6.55), "J1" },
-					{ "Panacotta", new Double(6.55), "J2" },
-					{ "Lemon Meringue Pie", new Double(6.55), "J3" },
-					{ "Chutney", new Double(7.55), "J4" }, }, new String[] {
-					"Desserts", "Price (SGD$)", "Code" }) {
-				Class[] columnTypes = new Class[] { String.class, Double.class,
-						String.class };
+					{ "Pistachio Biscotti", new Double(6.55) },
+					{ "Panacotta", new Double(6.55) },
+					{ "Lemon Meringue Pie", new Double(6.55) },
+					{ "Chutney", new Double(7.55) }, }, new String[] {
+					"Desserts", "Price (SGD$)" }) {
+				Class[] columnTypes = new Class[] { String.class, Double.class };
 
 				public Class getColumnClass(int columnIndex) {
 					return columnTypes[columnIndex];
 				}
-
-				boolean[] columnEditables = new boolean[] { false, false, false };
-
-				public boolean isCellEditable(int row, int column) {
-					return columnEditables[column];
-				}
 			});
 			table_9.getColumnModel().getColumn(0).setResizable(false);
 			table_9.getColumnModel().getColumn(1).setResizable(false);
-			table_9.getColumnModel().getColumn(2).setResizable(false);
 			table_9.setRowHeight(50);
 			table_9.setFont(new Font("Calibri", Font.BOLD, 18));
 			table_9.setFillsViewportHeight(true);
@@ -841,8 +756,6 @@ public class Menu extends JPanel {
 						setItem(item);
 						price = (Double) table_2.getValueAt(row, i = 1);
 						setPrice(price);
-						code = (String) table_2.getValueAt(row, i = 2);
-						setCode(code);
 					}
 
 					quantity = Integer.parseInt(JOptionPane.showInputDialog(
@@ -860,7 +773,6 @@ public class Menu extends JPanel {
 							"Place order", JOptionPane.OK_OPTION);
 
 					simplytech.entity.Menu menu = new simplytech.entity.Menu();
-					menu.setCode(code);
 					menu.setQuantity(quantity);
 					menu.setItem(item);
 					menu.setTotalPrice(totalPrice);
@@ -869,9 +781,12 @@ public class Menu extends JPanel {
 					menu.setId(id);
 					MenuDAO.save(menu);
 					try {
-						CustomerDAO.updateCharges(finalCharges, MainFrame.getPersonWhoLogin().getId());
-						CustomerDAO.updatePoints(finalPoints, MainFrame.getPersonWhoLogin().getId());
-						MainFrame.getPersonWhoLogin().setExtraCharges(finalCharges);
+						CustomerDAO.updateCharges(finalCharges, MainFrame
+								.getPersonWhoLogin().getId());
+						CustomerDAO.updatePoints(finalPoints, MainFrame
+								.getPersonWhoLogin().getId());
+						MainFrame.getPersonWhoLogin().setExtraCharges(
+								finalCharges);
 						MainFrame.getPersonWhoLogin().setPoints(finalPoints);
 					} catch (SQLException e7) {
 						// TODO Auto-generated catch block
@@ -902,10 +817,8 @@ public class Menu extends JPanel {
 
 						item = (String) table_3.getValueAt(row, i = 0);
 						price = (Double) table_3.getValueAt(row, i = 1);
-						code = (String) table_3.getValueAt(row, i = 2);
 						setItem(item);
 						setPrice(price);
-						setCode(code);
 					}
 
 					quantity = Integer.parseInt(JOptionPane.showInputDialog(
@@ -916,14 +829,13 @@ public class Menu extends JPanel {
 					points = (int) totalPrice;
 					finalCharges = currentCharges + totalPrice;
 					finalPoints = currentPoints + points;
-					
+
 					JOptionPane.showConfirmDialog(myFrame, "You have ordered: "
 							+ quantity + " x " + item + "\n Total: SGD$"
 							+ totalPrice + "\n Points earned: " + points,
 							"Place order", JOptionPane.OK_OPTION);
 
 					simplytech.entity.Menu menu = new simplytech.entity.Menu();
-					menu.setCode(code);
 					menu.setQuantity(quantity);
 					menu.setItem(item);
 					menu.setTotalPrice(totalPrice);
@@ -932,9 +844,12 @@ public class Menu extends JPanel {
 					menu.setId(id);
 					MenuDAO.save(menu);
 					try {
-						CustomerDAO.updateCharges(finalCharges, MainFrame.getPersonWhoLogin().getId());
-						CustomerDAO.updatePoints(finalPoints, MainFrame.getPersonWhoLogin().getId());
-						MainFrame.getPersonWhoLogin().setExtraCharges(finalCharges);
+						CustomerDAO.updateCharges(finalCharges, MainFrame
+								.getPersonWhoLogin().getId());
+						CustomerDAO.updatePoints(finalPoints, MainFrame
+								.getPersonWhoLogin().getId());
+						MainFrame.getPersonWhoLogin().setExtraCharges(
+								finalCharges);
 						MainFrame.getPersonWhoLogin().setPoints(finalPoints);
 					} catch (SQLException e6) {
 						// TODO Auto-generated catch block
@@ -965,10 +880,8 @@ public class Menu extends JPanel {
 
 						item = (String) table_4.getValueAt(row, i = 0);
 						price = (Double) table_4.getValueAt(row, i = 1);
-						code = (String) table_4.getValueAt(row, i = 2);
 						setItem(item);
 						setPrice(price);
-						setCode(code);
 					}
 
 					quantity = Integer.parseInt(JOptionPane.showInputDialog(
@@ -986,7 +899,6 @@ public class Menu extends JPanel {
 							"Place order", JOptionPane.OK_OPTION);
 
 					simplytech.entity.Menu menu = new simplytech.entity.Menu();
-					menu.setCode(code);
 					menu.setQuantity(quantity);
 					menu.setItem(item);
 					menu.setTotalPrice(totalPrice);
@@ -995,9 +907,12 @@ public class Menu extends JPanel {
 					menu.setId(id);
 					MenuDAO.save(menu);
 					try {
-						CustomerDAO.updateCharges(finalCharges, MainFrame.getPersonWhoLogin().getId());
-						CustomerDAO.updatePoints(finalPoints, MainFrame.getPersonWhoLogin().getId());
-						MainFrame.getPersonWhoLogin().setExtraCharges(finalCharges);
+						CustomerDAO.updateCharges(finalCharges, MainFrame
+								.getPersonWhoLogin().getId());
+						CustomerDAO.updatePoints(finalPoints, MainFrame
+								.getPersonWhoLogin().getId());
+						MainFrame.getPersonWhoLogin().setExtraCharges(
+								finalCharges);
 						MainFrame.getPersonWhoLogin().setPoints(finalPoints);
 					} catch (SQLException e5) {
 						// TODO Auto-generated catch block
@@ -1030,10 +945,8 @@ public class Menu extends JPanel {
 
 						item = (String) table_5.getValueAt(row, i = 0);
 						price = (Double) table_5.getValueAt(row, i = 1);
-						code = (String) table_5.getValueAt(row, i = 2);
 						setItem(item);
 						setPrice(price);
-						setCode(code);
 					}
 
 					quantity = Integer.parseInt(JOptionPane.showInputDialog(
@@ -1049,7 +962,6 @@ public class Menu extends JPanel {
 							"Place order", JOptionPane.OK_OPTION);
 
 					simplytech.entity.Menu menu = new simplytech.entity.Menu();
-					menu.setCode(code);
 					menu.setQuantity(quantity);
 					menu.setItem(item);
 					menu.setTotalPrice(totalPrice);
@@ -1081,10 +993,8 @@ public class Menu extends JPanel {
 
 						item = (String) table_6.getValueAt(row, i = 0);
 						price = (Double) table_6.getValueAt(row, i = 1);
-						code = (String) table_6.getValueAt(row, i = 2);
 						setItem(item);
 						setPrice(price);
-						setCode(code);
 					}
 
 					quantity = Integer.parseInt(JOptionPane.showInputDialog(
@@ -1103,7 +1013,6 @@ public class Menu extends JPanel {
 							"Place order", JOptionPane.OK_OPTION);
 
 					simplytech.entity.Menu menu = new simplytech.entity.Menu();
-					menu.setCode(code);
 					menu.setQuantity(quantity);
 					menu.setItem(item);
 					menu.setTotalPrice(totalPrice);
@@ -1114,9 +1023,12 @@ public class Menu extends JPanel {
 					finalCharges = currentCharges + totalPrice;
 					finalPoints = currentPoints + points;
 					try {
-						CustomerDAO.updateCharges(finalCharges, MainFrame.getPersonWhoLogin().getId());
-						CustomerDAO.updatePoints(finalPoints, MainFrame.getPersonWhoLogin().getId());
-						MainFrame.getPersonWhoLogin().setExtraCharges(finalCharges);
+						CustomerDAO.updateCharges(finalCharges, MainFrame
+								.getPersonWhoLogin().getId());
+						CustomerDAO.updatePoints(finalPoints, MainFrame
+								.getPersonWhoLogin().getId());
+						MainFrame.getPersonWhoLogin().setExtraCharges(
+								finalCharges);
 						MainFrame.getPersonWhoLogin().setPoints(finalPoints);
 					} catch (SQLException e4) {
 						// TODO Auto-generated catch block
@@ -1147,10 +1059,8 @@ public class Menu extends JPanel {
 
 						item = (String) table_7.getValueAt(row, i = 0);
 						price = (Double) table_7.getValueAt(row, i = 1);
-						code = (String) table_7.getValueAt(row, i = 2);
 						setItem(item);
 						setPrice(price);
-						setCode(code);
 					}
 
 					quantity = Integer.parseInt(JOptionPane.showInputDialog(
@@ -1168,7 +1078,6 @@ public class Menu extends JPanel {
 							"Place order", JOptionPane.OK_OPTION);
 
 					simplytech.entity.Menu menu = new simplytech.entity.Menu();
-					menu.setCode(code);
 					menu.setQuantity(quantity);
 					menu.setItem(item);
 					menu.setTotalPrice(totalPrice);
@@ -1177,9 +1086,12 @@ public class Menu extends JPanel {
 					menu.setId(id);
 					MenuDAO.save(menu);
 					try {
-						CustomerDAO.updateCharges(finalCharges, MainFrame.getPersonWhoLogin().getId());
-						CustomerDAO.updatePoints(finalPoints, MainFrame.getPersonWhoLogin().getId());
-						MainFrame.getPersonWhoLogin().setExtraCharges(finalCharges);
+						CustomerDAO.updateCharges(finalCharges, MainFrame
+								.getPersonWhoLogin().getId());
+						CustomerDAO.updatePoints(finalPoints, MainFrame
+								.getPersonWhoLogin().getId());
+						MainFrame.getPersonWhoLogin().setExtraCharges(
+								finalCharges);
 						MainFrame.getPersonWhoLogin().setPoints(finalPoints);
 					} catch (SQLException e3) {
 						// TODO Auto-generated catch block
@@ -1210,10 +1122,8 @@ public class Menu extends JPanel {
 
 						item = (String) table_8.getValueAt(row, i = 0);
 						price = (Double) table_8.getValueAt(row, i = 1);
-						code = (String) table_8.getValueAt(row, i = 2);
 						setItem(item);
 						setPrice(price);
-						setCode(code);
 					}
 
 					quantity = Integer.parseInt(JOptionPane.showInputDialog(
@@ -1231,7 +1141,6 @@ public class Menu extends JPanel {
 							"Place order", JOptionPane.OK_OPTION);
 
 					simplytech.entity.Menu menu = new simplytech.entity.Menu();
-					menu.setCode(code);
 					menu.setQuantity(quantity);
 					menu.setItem(item);
 					menu.setTotalPrice(totalPrice);
@@ -1240,9 +1149,12 @@ public class Menu extends JPanel {
 					menu.setId(id);
 					MenuDAO.save(menu);
 					try {
-						CustomerDAO.updateCharges(finalCharges, MainFrame.getPersonWhoLogin().getId());
-						CustomerDAO.updatePoints(finalPoints, MainFrame.getPersonWhoLogin().getId());
-						MainFrame.getPersonWhoLogin().setExtraCharges(finalCharges);
+						CustomerDAO.updateCharges(finalCharges, MainFrame
+								.getPersonWhoLogin().getId());
+						CustomerDAO.updatePoints(finalPoints, MainFrame
+								.getPersonWhoLogin().getId());
+						MainFrame.getPersonWhoLogin().setExtraCharges(
+								finalCharges);
 						MainFrame.getPersonWhoLogin().setPoints(finalPoints);
 					} catch (SQLException e2) {
 						// TODO Auto-generated catch block
@@ -1273,10 +1185,8 @@ public class Menu extends JPanel {
 
 						item = (String) table_9.getValueAt(row, i = 0);
 						price = (Double) table_9.getValueAt(row, i = 1);
-						code = (String) table_9.getValueAt(row, i = 2);
 						setItem(item);
 						setPrice(price);
-						setCode(code);
 					}
 
 					quantity = Integer.parseInt(JOptionPane.showInputDialog(
@@ -1294,7 +1204,6 @@ public class Menu extends JPanel {
 							"Place order", JOptionPane.OK_OPTION);
 
 					simplytech.entity.Menu menu = new simplytech.entity.Menu();
-					menu.setCode(code);
 					menu.setQuantity(quantity);
 					menu.setItem(item);
 					menu.setTotalPrice(totalPrice);
@@ -1303,9 +1212,12 @@ public class Menu extends JPanel {
 					menu.setId(id);
 					MenuDAO.save(menu);
 					try {
-						CustomerDAO.updateCharges(finalCharges, MainFrame.getPersonWhoLogin().getId());
-						CustomerDAO.updatePoints(finalPoints, MainFrame.getPersonWhoLogin().getId());
-						MainFrame.getPersonWhoLogin().setExtraCharges(finalCharges);
+						CustomerDAO.updateCharges(finalCharges, MainFrame
+								.getPersonWhoLogin().getId());
+						CustomerDAO.updatePoints(finalPoints, MainFrame
+								.getPersonWhoLogin().getId());
+						MainFrame.getPersonWhoLogin().setExtraCharges(
+								finalCharges);
 						MainFrame.getPersonWhoLogin().setPoints(finalPoints);
 					} catch (SQLException e1) {
 						// TODO Auto-generated catch block

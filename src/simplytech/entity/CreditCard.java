@@ -2,7 +2,6 @@ package simplytech.entity;
 
 public class CreditCard{
 
-	Person p1 = new Person();
 	private String cardNumber;
 	private int expiryMonth;
 	private int expiryYear;

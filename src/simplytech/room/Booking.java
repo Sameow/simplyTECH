@@ -23,6 +23,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.sql.SQLException;
+import java.util.Calendar;
 
 public class Booking extends JPanel {
 
@@ -54,7 +55,10 @@ public class Booking extends JPanel {
 	private int finalPoints;
 	private double currentCharges;
 	private double finalCharges;
-	
+	private Calendar calendar;
+	private long start;
+	private long stop;
+
 	/**
 	 * This method initializes jButtonMovies
 	 * 
@@ -167,14 +171,24 @@ public class Booking extends JPanel {
 		jLabelBack.setIcon(new ImageIcon(Booking.class
 				.getResource("/simplytech/image/Swap Left.png")));
 		jLabelBack.addMouseListener(new java.awt.event.MouseAdapter() {
-			public void mouseClicked(java.awt.event.MouseEvent e) {
-				// System.out.println("mouseClicked()"); // TODO Auto-generated
-				// Event stub mouseClicked()
-				JPanel panel = new Services(myFrame);
-				myFrame.getContentPane().removeAll();
-				myFrame.getContentPane().add(panel);
-				myFrame.getContentPane().validate();
-				myFrame.getContentPane().repaint();
+			public void mousePressed(MouseEvent e) {
+				start = calendar.getInstance().getTimeInMillis();
+			}
+			public void mouseReleased(MouseEvent arg0) {
+				stop = calendar.getInstance().getTimeInMillis();
+				if (stop - start < 500) {
+					JPanel panel = new Services(myFrame);
+					myFrame.getContentPane().removeAll();
+					myFrame.getContentPane().add(panel);
+					myFrame.getContentPane().validate();
+					myFrame.getContentPane().repaint();
+				} else {
+					JPanel panel = new RoomHomePagePanel(myFrame);
+					myFrame.getContentPane().removeAll();
+					myFrame.getContentPane().add(panel);
+					myFrame.getContentPane().validate();
+					myFrame.getContentPane().repaint();
+				}
 			}
 		});
 		jLabelBooking = new JLabel();

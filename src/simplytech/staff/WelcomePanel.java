@@ -1,6 +1,15 @@
 package simplytech.staff;
 
 import java.awt.GridBagLayout;
+import javax.swing.JProgressBar;
+
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 import javax.swing.JPanel;
 import java.awt.Dimension;
 import javax.swing.JLabel;
@@ -12,6 +21,7 @@ import java.awt.GridBagConstraints;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.JPasswordField;
 import javax.swing.JTextPane;
@@ -19,6 +29,7 @@ import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
 
 import simplytech.components.DesEncryption;
+import simplytech.components.TokenCodeGenerator;
 import simplytech.dao.PersonDAO;
 import simplytech.dao.StaffDAO;
 import simplytech.entity.Person;
@@ -28,6 +39,7 @@ import simplytech.entity.Staff;
 import java.awt.event.KeyEvent;
 import java.net.SocketException;
 import java.sql.SQLException;
+import java.util.Properties;
 
 public class WelcomePanel extends JPanel {
 
@@ -44,18 +56,22 @@ public class WelcomePanel extends JPanel {
 	private JButton jButtonLogin = null;
 	private JFrame myFrame=null;
 	private JLabel jLabelForgotPassword = null;
-	private JTextPane errorMessage;
+	private JLabel errorMessage;
+	private String tokenCode;
+	private JProgressBar jProgressBar = null;
+	private String encryptedTokenCode;
 	/**
 	 * This is the default constructor
 	 */
 	public WelcomePanel() {
 		super();
+		initialize();
 	}
 
 	public WelcomePanel(JFrame f) {
 		this();
 		myFrame=f;
-		initialize();
+//		initialize();
 	}
 	/**
 	 * This method initializes this
@@ -87,7 +103,7 @@ public class WelcomePanel extends JPanel {
 		}
 		
 		);
-		
+		this.add(getJProgressBar(), null);
 		this.setSize(1013, 580);
 		this.setLayout(null);
 		this.setBackground(new Color(227, 228, 250));
@@ -112,14 +128,13 @@ public class WelcomePanel extends JPanel {
 	 * @return javax.swing.JLabel	
 	 */
 	
-	private JTextPane getErrorMessage() {
+	private JLabel getErrorMessage() {
 		if (errorMessage == null) {
-			errorMessage = new JTextPane();
-			errorMessage.setEditable(false);
+			errorMessage = new JLabel();
 			errorMessage.setForeground(Color.RED);
 			errorMessage.setFont(new Font("Calibri", Font.PLAIN, 14));
 			errorMessage.setBackground(new Color(227,228,250));
-			errorMessage.setBounds(572, 249, 135, 67);
+			errorMessage.setBounds(572, 249, 200, 67);
 		}
 		return errorMessage;
 	}
@@ -215,17 +230,15 @@ public class WelcomePanel extends JPanel {
 			jButtonLogin.setPreferredSize(new Dimension(289, 100));
 			jButtonLogin.setRolloverEnabled(true);
 			jButtonLogin.setBackground(new Color(219, 250, 255));
-			 Border roundedBorder = new LineBorder(new Color(227, 228, 250), 2, true); // the third parameter - true, says it's round
-			    jButtonLogin.setBorder(roundedBorder);
+			Border roundedBorder = new LineBorder(new Color(227, 228, 250), 2, true); // the third parameter - true, says it's round
+			jButtonLogin.setBorder(roundedBorder);
 			jButtonLogin.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
-					errorMessage.setText("Creating token code....");
 					//Check credentials
 					String username = jTextFieldStaffID.getText();
 					String password = new String(jPasswordFieldPassword.getPassword());
 					//Create the Staff
 					Person person=PersonDAO.searchByUsername(username);
-					errorMessage.setText("");
 					if (person == null){
 						errorMessage.setText("Username does not exist.");
 					}
@@ -241,15 +254,35 @@ public class WelcomePanel extends JPanel {
 					boolean allowed = checkLogin(staff,password);
 					
 					if (allowed == true){
-						
+						errorMessage.setText("Sending email....");
+						jProgressBar.setVisible(false);
+						jProgressBar.setValue(0);						
 						MainFrame.setPersonWhoLogin(staff);
-						JPanel panel=new TokenCode(myFrame);
+						encryptedTokenCode=createTokenCode();
+						DesEncryption encrypt = new DesEncryption("Password");
+						tokenCode = encrypt.decrypt(encryptedTokenCode);
+						
+						boolean emailSent = sendEmail(MainFrame.getPersonWhoLogin().getEmail(), MainFrame.getPersonWhoLogin().getName(), tokenCode);
+						if (emailSent) {
+							jProgressBar.setValue(100);
+							errorMessage.setText("Email sent!");
+							JOptionPane.showMessageDialog(null,
+									"Please check your email for your token code", "Success!",
+									JOptionPane.INFORMATION_MESSAGE);
+						JPanel panel=new TokenCode(myFrame, encryptedTokenCode);
 						myFrame.getContentPane().removeAll();
 						myFrame.getContentPane().add(panel);
 						myFrame.getContentPane().validate();
 						myFrame.getContentPane().repaint();	
-					}
+						}
+						else
+							JOptionPane.showMessageDialog(null,
+									"Failed to sent token code to email", "",
+									JOptionPane.ERROR_MESSAGE);
+								
+						}
 					else {
+						errorMessage.setForeground(Color.RED);
 						errorMessage.setText("Invalid username or password");
 					}
 					
@@ -262,12 +295,70 @@ public class WelcomePanel extends JPanel {
 		if (person != null) {
 			String pwd = person.getPassword();
 			DesEncryption encryption = new DesEncryption("Password");
-			String encrypted = encryption.encrypt(pwd);
-			String decryptPwd = encryption.decrypt(encrypted);
-			if (decryptPwd.equals(pwd)) 
+			//Encrypt input password
+			String encrypted = encryption.encrypt(password);
+			System.out.println("encrypted = "+encrypted);
+			System.out.println("If encrypted = 4Ih5psA/yuM=, password is spacebar.");
+			if (encrypted.equals(pwd)) { 
 				return true;
+			}
 		} 
 		return false;
-	}				
+	}	
+	
+	private JProgressBar getJProgressBar() {
+		if (jProgressBar == null) {
+			jProgressBar = new JProgressBar();
+			jProgressBar.setBounds(new Rectangle(600, 343, 147, 32));
+			jProgressBar.setVisible(false);
+		}
+		return jProgressBar;
+	}
+	
+	public String createTokenCode(){
+		//Generate token code
+		String newTokenCodeToBeInsertedToDB=Integer.toString(TokenCodeGenerator.newTokenCode());
+		System.out.println("String newTokenCodeToBeInsertedToDB = "+newTokenCodeToBeInsertedToDB);
+		//Encrypt it.
+		DesEncryption encrypter = new DesEncryption("Password");
+		String encrypted = encrypter.encrypt(newTokenCodeToBeInsertedToDB);
+		return encrypted;
+	}
+	
+	public boolean sendEmail(String recipientEmail, String recipientName, String newTokenCode) {
+		jProgressBar.setValue(20);
+		final String username = "simplytechcm@gmail.com";
+		final String password = "oopjpass";
+
+		Properties props = new Properties();
+		props.put("mail.smtp.auth", "true");
+		props.put("mail.smtp.starttls.enable", "true");
+		props.put("mail.smtp.host", "smtp.gmail.com");
+		props.put("mail.smtp.port", "587");
+		jProgressBar.setValue(40);
+		Session session = Session.getInstance(props,
+				new javax.mail.Authenticator() {
+					protected PasswordAuthentication getPasswordAuthentication() {
+						return new javax.mail.PasswordAuthentication(username, password);
+					}
+				});
+		jProgressBar.setValue(60);
+		try {
+
+			Message message = new MimeMessage(session);
+			message.setFrom(new InternetAddress(recipientEmail));
+			message.setRecipients(Message.RecipientType.TO,
+					InternetAddress.parse(recipientEmail));
+			message.setSubject("Token Code");
+			message.setText("Dear " + recipientName + ","
+					+ "\n\nYour token code is: " + newTokenCode
+					+ "\n\nRegards, \nSamuel Ong, \nHead of Security Department");
+			Transport.send(message);
+			jProgressBar.setValue(80);
+			return true;
+		} catch (MessagingException e) {
+			return false;
+		}
+	}
 
 }

@@ -1,4 +1,4 @@
-package simplytech.lobby;
+	package simplytech.lobby;
 import javax.swing.SwingUtilities;
 import java.awt.BorderLayout;
 import javax.swing.JPanel;

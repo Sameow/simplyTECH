@@ -85,16 +85,15 @@ public class RedemptionPanel extends JPanel {
 	private String details;
 	private String macAddress = null;
 	private String imageForSql = "";
+	private Calendar calendar;
+	private long start;
+	private long stop;
+
 	
 	/**
 	 * This is the default constructor
 	 */
-	public RedemptionPanel() {
-		super();
-	}
-
 	public RedemptionPanel(JFrame f, String voucherType) {
-		this();
 		this.voucherType = voucherType;
 		myFrame = f;
 		initialize();
@@ -131,12 +130,24 @@ public class RedemptionPanel extends JPanel {
 		jLabelBack.setIcon(new ImageIcon(getClass().getResource(
 				"/simplyTECH/image/Swap Left.png")));
 		jLabelBack.addMouseListener(new java.awt.event.MouseAdapter() {
-			public void mouseClicked(java.awt.event.MouseEvent e) {
-				JPanel panel = new PointsRewardSystemPanel2(myFrame);
-				myFrame.getContentPane().removeAll();
-				myFrame.getContentPane().add(panel);
-				myFrame.getContentPane().validate();
-				myFrame.getContentPane().repaint();
+			public void mousePressed(MouseEvent e) {
+				start = calendar.getInstance().getTimeInMillis();
+			}
+			public void mouseReleased(MouseEvent arg0) {
+				stop = calendar.getInstance().getTimeInMillis();
+				if (stop - start < 500) {
+					JPanel panel = new PointsRewardSystemPanel2(myFrame, "Services");
+					myFrame.getContentPane().removeAll();
+					myFrame.getContentPane().add(panel);
+					myFrame.getContentPane().validate();
+					myFrame.getContentPane().repaint();
+				} else {
+					JPanel panel = new RoomHomePagePanel(myFrame);
+					myFrame.getContentPane().removeAll();
+					myFrame.getContentPane().add(panel);
+					myFrame.getContentPane().validate();
+					myFrame.getContentPane().repaint();
+				}
 			}
 		});
 		jLabelMyVouchers = new JLabel();
@@ -262,7 +273,7 @@ public class RedemptionPanel extends JPanel {
 						jTextPaneTitle.setText(title);
 						jTextPaneSubtitle.setText(subtitle);
 						jTextPaneDetails.setText(details);
-						jLabelPoints.setText(pointsRequired + "");
+						jLabelPoints.setText(pointsRequired + " points");
 						jLabelPoints.setName(pointsRequired + "");
 						panes.get(id).setBackground(new Color(31, 78, 121));
 					}

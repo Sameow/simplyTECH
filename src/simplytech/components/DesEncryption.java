@@ -87,9 +87,9 @@ public class DesEncryption {
 			// Create encrypter/decrypter class
 			DesEncryption encrypter = new DesEncryption("Password");
 			// Encrypt
-			String encrypted = encrypter.encrypt("Eg2uSh0qPz");
+			String encrypted = encrypter.encrypt("11111111");
 			System.out.println(encrypted);
-			String decrypted = encrypter.decrypt("DN3tmmGNsrdWa8DVSfA7fw==");
+			String decrypted = encrypter.decrypt("UNCHLWTDL5RI3BiMmNCdqA==");
 			System.out.println(decrypted);
 		} catch (Exception e) {
 		}

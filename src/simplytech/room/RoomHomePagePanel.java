@@ -101,6 +101,7 @@ public class RoomHomePagePanel extends JPanel {
 	private double extraCharges = 0;
 	private String checkOut = "";
 	private int stays;
+	private ArrayList<CustomerVouchers> customerVouchers;
 
 	/**
 	 * This is the default constructor
@@ -124,46 +125,52 @@ public class RoomHomePagePanel extends JPanel {
 	private void initialize() {
 		Date date = new Date();
 		Date currentDate = date;
-		CustomerVouchers customerVouchers = CustomerVouchersDAO
-				.searchById(MainFrame.getPersonWhoLogin().getId());
-		if (customerVouchers != null) {
-			voucherName = customerVouchers.getTitle();
-			String expiryDateString = customerVouchers.getExpiryDate();
-			DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss dd MMM yyyy");
-			Date expiryDate = null;
-			try {
-				if (expiryDateString != null) {
-					expiryDate = dateFormat.parse(expiryDateString);
-					if (currentDate.after(expiryDate)) {
-						try {
-							CustomerVouchersDAO.deleteVoucher(customerVouchers
-									.getExpiryDate());
-							int option = JOptionPane.showConfirmDialog(myFrame,
-									"Your voucher(s) " + voucherName
-											+ " has expired", "Confirmation",
-									JOptionPane.PLAIN_MESSAGE);
-						} catch (SQLException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
+		customerVouchers = CustomerVouchersDAO.retrieveAll(MainFrame
+				.getPersonWhoLogin().getId());
+		for (int i = 0; i < customerVouchers.size(); i++) {
+			if (customerVouchers != null) {
+				voucherName = customerVouchers.get(i).getTitle();
+				String expiryDateString = customerVouchers.get(i).getExpiryDate();
+				DateFormat dateFormat = new SimpleDateFormat(
+						"HH:mm:ss dd MMM yyyy");
+				Date expiryDate = null;
+				try {
+					if (expiryDateString != null) {
+						expiryDate = dateFormat.parse(expiryDateString);
+						if (currentDate.after(expiryDate)) {
+							try {
+								System.out.println("deleting...");
+								CustomerVouchersDAO
+										.deleteVoucher(customerVouchers
+												.get(i).getExpiryDate());
+								int option = JOptionPane.showConfirmDialog(
+										myFrame, "Your voucher(s) "
+												+ voucherName + " has expired",
+										"Confirmation",
+										JOptionPane.PLAIN_MESSAGE);
+							} catch (SQLException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
 						}
 					}
+				} catch (ParseException e3) {
 				}
-			} catch (ParseException e3) {
-			}
 
+			}
 		}
 		simplytech.entity.AlarmClock alarm = AlarmClockDAO.searchById(MainFrame
 				.getPersonWhoLogin().getId());
-		if (alarm != null){
+		if (alarm != null) {
 			alarmHour = alarm.getHour();
 			alarmMinute = alarm.getMinute();
 		}
 		extraCharges = MainFrame.getPersonWhoLogin().getExtraCharges();
 		int points = MainFrame.getPersonWhoLogin().getPoints();
 		String membership = MainFrame.getPersonWhoLogin().getMembership();
-		System.out.println(">>>" + membership);
-		AccommodationsEntity accommodation = AccommodationsDAO.searchById(MainFrame.getPersonWhoLogin().getId()+"");
-		if (accommodation != null){
+		AccommodationsEntity accommodation = AccommodationsDAO
+				.searchById(MainFrame.getPersonWhoLogin().getId() + "");
+		if (accommodation != null) {
 			checkOut = accommodation.getAccoCheckOut();
 			stays = accommodation.getAccoDay();
 		}
@@ -251,7 +258,7 @@ public class RoomHomePagePanel extends JPanel {
 			frame.setLocationByPlatform(true);
 			frame.setSize(500, 100);
 			frame.setVisible(true);
-			frame.setLocation(1000, 300);
+			frame.setLocation(500, 300);
 		}
 		frame.getContentPane().setLayout(null);
 		if (checkDND == 1) {
@@ -715,7 +722,7 @@ public class RoomHomePagePanel extends JPanel {
 			labelBack.addMouseListener(new MouseAdapter() {
 				public void mouseClicked(MouseEvent e) {
 					j = j - 1;
-					if (j == -1) {
+					if (j <= -1) {
 						j = count - 1;
 					}
 					setAnnouncement(j);
@@ -734,7 +741,7 @@ public class RoomHomePagePanel extends JPanel {
 				@Override
 				public void mouseClicked(MouseEvent e) {
 					j = j + 1;
-					if (j == count) {
+					if (j >= count) {
 						j = 0;
 					}
 					setAnnouncement(j);

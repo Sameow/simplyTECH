@@ -9,6 +9,8 @@ import java.sql.Statement;
 
 import simplytech.databasestatements.DBConnectionManager;
 import simplytech.entity.AlarmClock;
+import simplytech.entity.Customer;
+import simplytech.entity.Person;
 
 public class AlarmClockDAO {
 
@@ -98,10 +100,23 @@ public class AlarmClockDAO {
 		}
 		return count;
 	}
-
-	public static void save(simplytech.entity.AlarmClock alarm) {
-
+	
+	public static void createAlarm(Person person) {
+		int id = 0;
 		Statement stmt = null;
+		Connection con=null;
+		String DbQuery = "SELECT MAX(ID) FROM person";
+		ResultSet rs = null;
+		try {
+			con=DriverManager.getConnection("jdbc:mysql://localhost:8888/simplytech","simplyTECH","hahaudie");
+			stmt = con.createStatement();
+			rs = stmt.executeQuery(DbQuery);
+			while(rs.next()){
+		         id = rs.getInt("MAX(ID)");
+		    }
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+		}
 
 		// get the last member ID
 		try {
@@ -114,10 +129,73 @@ public class AlarmClockDAO {
 			pstmt = currentCon.prepareStatement(query);
 
 			// inserting values
+			pstmt.setInt(1, 0);
+			pstmt.setInt(2, 0);
+			pstmt.setString(3, person.getUsername());
+			pstmt.setInt(4, id);
+			pstmt.executeUpdate();
+
+		} catch (Exception ex) {
+
+			System.out.println("Set Alarm fail: An Exception has occurred! "
+					+ ex);
+		}
+
+		// exception handling
+		finally {
+			if (rs != null) {
+				try {
+					rs.close();
+				} catch (Exception e) {
+				}
+				rs = null;
+			}
+
+			if (stmt != null) {
+				try {
+					stmt.close();
+				} catch (Exception e) {
+				}
+				stmt = null;
+			}
+
+			if (currentCon != null) {
+				try {
+					currentCon.close();
+				} catch (Exception e) {
+				}
+
+				currentCon = null;
+			}
+		}
+
+	}
+	
+	
+
+	
+
+	public static void save(simplytech.entity.AlarmClock alarm) {
+
+		Statement stmt = null;
+
+		// get the last member ID
+		try {
+
+			currentCon = DBConnectionManager.getConnection();
+			stmt = currentCon.createStatement();
+
+			// query for inserting into the table
+			//String query = "update into alarmclock(hour,minute,username,id) values(?,?,?,?)";
+			String query = "update alarmclock set hour = ?, minute = ?, username = ?, id = ? where id = ?";
+			pstmt = currentCon.prepareStatement(query);
+
+			// inserting values
 			pstmt.setInt(1, alarm.getHour());
 			pstmt.setInt(2, alarm.getMinute());
 			pstmt.setString(3, alarm.getUsername());
 			pstmt.setInt(4, alarm.getId());
+			pstmt.setInt(5, alarm.getId());
 			pstmt.executeUpdate();
 
 		} catch (Exception ex) {

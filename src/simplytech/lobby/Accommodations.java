@@ -12,6 +12,8 @@ import javax.swing.ButtonGroup;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.ImageIcon;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import javax.swing.JTextPane;
 import javax.swing.JOptionPane;
@@ -38,6 +40,9 @@ import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import com.toedter.calendar.JDateChooser;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeEvent;
 
 public class Accommodations extends JPanel {
 
@@ -50,7 +55,7 @@ public class Accommodations extends JPanel {
 	private JLabel jLabelAccoMembership = null;
 	private JTextPane jTextPaneAccoRoom = null;
 	private JTextPane jTextPaneAccoRooms = null;
-	private JTextPane jTextPaneAccoDays = null;
+	private JTextPane jTextPaneAccoFrom = null;
 	private JTextPane jTextPaneAccoPreference = null;
 	private JTextPane jTextPaneAccoConRoom = null;
 	private JTextPane jTextPaneAccoSeaView = null;
@@ -87,6 +92,17 @@ public class Accommodations extends JPanel {
 	private int getRoom;
 	private int room;
 	private JComboBox comboBox_Suite;
+	private JDateChooser dateChooser_From = null;
+	private JDateChooser dateChooser_To = null;
+	private Calendar from;
+	private Calendar to;
+	private Calendar c;
+	private int totalDate;
+	private boolean checkDate = false;
+	private SimpleDateFormat timeFormat = new SimpleDateFormat(
+			"HH:mm:ss dd MMM yyyy");
+	private int noOfDays = 0;
+	private JSpinner spinner = null;
 
 	/**
 	 * This is the default constructor
@@ -99,8 +115,7 @@ public class Accommodations extends JPanel {
 	public Accommodations(JFrame f) {
 		this();
 		myFrame = f;
-		initialize();
-
+		// initialize();
 	}
 
 	/**
@@ -111,7 +126,7 @@ public class Accommodations extends JPanel {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private void initialize() {
 		card = CreditCardDAO.searchById(MainFrame.getPersonWhoLogin().getId());
-		cardNumber = card.getCardNumber()+"";
+		cardNumber = card.getCardNumber() + "";
 		cardType = card.getCardType();
 		membership = MainFrame.getPersonWhoLogin().getMembership();
 		points = MainFrame.getPersonWhoLogin().getPoints();
@@ -171,6 +186,17 @@ public class Accommodations extends JPanel {
 		displayName.setText(MainFrame.getPersonWhoLogin().getName());
 		add(displayName);
 
+		spinner = new JSpinner();
+//		spinner.addMouseListener(new MouseAdapter() {
+//			public void mouseClicked(MouseEvent arg0) {
+//				room = (int) spinner.getValue();
+//			}
+//		});
+		spinner.setModel(new SpinnerNumberModel(new Integer(0), new Integer(0),
+				null, new Integer(1)));
+		spinner.setBounds(440, 355, 50, 23);
+		add(spinner);
+
 		JLabel displayCard = new JLabel("");
 		displayCard.setFont(new Font("Calibri", Font.PLAIN, 24));
 		displayCard.setBounds(40, 240, 235, 31);
@@ -193,7 +219,7 @@ public class Accommodations extends JPanel {
 		this.add(jLabelAccoMembership, null);
 		this.add(getJTextPaneAccoRoom(), null);
 		this.add(getJTextPaneAccoRooms(), null);
-		this.add(getJTextPaneAccoDays(), null);
+		this.add(getJTextPaneAccoFrom(), null);
 		this.add(getJTextPaneAccoPreference(), null);
 		this.add(getJTextPaneAccoConRoom(), null);
 		this.add(getJTextPaneAccoSeaView(), null);
@@ -231,7 +257,7 @@ public class Accommodations extends JPanel {
 		ButtonGroup ConRoom = new ButtonGroup();
 		ConRoom.add(YesRBCon);
 		ConRoom.add(NoRBCon);
-		add(getComboBox_Day());
+		// add(getComboBox_Day());
 		add(getComboBox_Room());
 
 		JTextPane txtpnPrice = new JTextPane();
@@ -242,7 +268,7 @@ public class Accommodations extends JPanel {
 		txtpnPrice.setFont(new Font("Arial", Font.PLAIN, 18));
 		txtpnPrice.setEditable(false);
 		txtpnPrice.setBackground(new Color(227, 228, 250));
-		txtpnPrice.setBounds(360, 450, 80, 30);
+		txtpnPrice.setBounds(650, 325, 80, 30);
 		add(txtpnPrice);
 		add(getJLabelPrice());
 		// add(getTxtpnRoomNo());
@@ -255,6 +281,24 @@ public class Accommodations extends JPanel {
 		label.setBounds(30, 325, 120, 30);
 		add(label);
 		add(getComboBox_Suite());
+
+		dateChooser_From = new JDateChooser();
+		dateChooser_From.setBounds(435, 215, 120, 23);
+		add(dateChooser_From);
+
+		JTextPane txtpnTo = new JTextPane();
+		txtpnTo.setText("To :");
+		txtpnTo.setSize(new Dimension(65, 28));
+		txtpnTo.setLocation(new Point(360, 210));
+		txtpnTo.setFont(new Font("Arial", Font.PLAIN, 18));
+		txtpnTo.setEditable(false);
+		txtpnTo.setBackground(new Color(227, 228, 250));
+		txtpnTo.setBounds(380, 280, 50, 28);
+		add(txtpnTo);
+
+		dateChooser_To = new JDateChooser();
+		dateChooser_To.setBounds(435, 285, 120, 23);
+		add(dateChooser_To);
 	}
 
 	private JLabel getDisplayPts() {
@@ -338,18 +382,18 @@ public class Accommodations extends JPanel {
 	 * 
 	 * @return javax.swing.JTextPane
 	 */
-	private JTextPane getJTextPaneAccoDays() {
-		if (jTextPaneAccoDays == null) {
-			jTextPaneAccoDays = new JTextPane();
-			jTextPaneAccoDays.setFont(new Font("Arial", Font.PLAIN, 18));
-			jTextPaneAccoDays.setText("Days :");
-			jTextPaneAccoDays.setEditable(false);
-			jTextPaneAccoDays.setSize(new Dimension(65, 28));
-			jTextPaneAccoDays.setLocation(new Point(360, 230));
-			jTextPaneAccoDays.setBackground(new Color(227, 228, 250));
+	private JTextPane getJTextPaneAccoFrom() {
+		if (jTextPaneAccoFrom == null) {
+			jTextPaneAccoFrom = new JTextPane();
+			jTextPaneAccoFrom.setFont(new Font("Arial", Font.PLAIN, 18));
+			jTextPaneAccoFrom.setText("From :");
+			jTextPaneAccoFrom.setEditable(false);
+			jTextPaneAccoFrom.setSize(new Dimension(65, 28));
+			jTextPaneAccoFrom.setLocation(new Point(362, 210));
+			jTextPaneAccoFrom.setBackground(new Color(227, 228, 250));
 
 		}
-		return jTextPaneAccoDays;
+		return jTextPaneAccoFrom;
 	}
 
 	/**
@@ -436,6 +480,7 @@ public class Accommodations extends JPanel {
 			jButtonGridView.setBounds(new Rectangle(650, 380, 95, 30));
 			jButtonGridView.setForeground(Color.white);
 			jButtonGridView.setText("Grid View");
+			jButtonGridView.setVisible(false);
 			jButtonGridView
 					.addActionListener(new java.awt.event.ActionListener() {
 						public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -466,59 +511,95 @@ public class Accommodations extends JPanel {
 			jButtonDone1.setBackground(new Color(91, 155, 213));
 			jButtonDone1.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
-
-					if (suite.equals("Orchid Suite")) {
-						getSuitePrice = 100;
-					} else if (suite.equals("Gold Suite")) {
-						getSuitePrice = 200;
-					} else if (suite.equals("Sands Suite")) {
-						getSuitePrice = 300;
-					} else if (suite.equals("Deluxe Suite")) {
-						getSuitePrice = 400;
-					} else if (suite.equals("Presidential Suite")) {
-						getSuitePrice = 500;
-					}
-					// Calculate price 1st
-					totalPrice = calculatePrice(getSuitePrice,
-							comboBox_Day.getSelectedIndex() + 1,
-							comboBox_Room.getSelectedIndex() + 1);
-					// Price then will show on the confirmation dialog
-					int option = JOptionPane.showConfirmDialog(myFrame,
-							"Are you sure you want to book " + (String) suite
-									+ "\n" + "Days: " + day + "\n" + "Rooms: "
-									+ room + "\n" + "Price: $" + totalPrice
-									+ "?", "Confirmation",
-							JOptionPane.YES_NO_OPTION);
-					SimpleDateFormat timeFormat = new SimpleDateFormat(
-							"HH:mm:ss dd MMM yyyy");
-					Date date = new Date();
-					Calendar c = Calendar.getInstance();
-					c.setTime(date);
-					c.add(Calendar.DATE, day);
-					checkOut = timeFormat.format(c.getTime());
-					if (option == JOptionPane.YES_OPTION) {
-						AccommodationsEntity accommodation = new AccommodationsEntity(MainFrame.getPersonWhoLogin().getId(),
-								suite, day, room, totalPrice, checkOut, "A1");
-						try {
-							AccommodationsDAO
-									.createAccommodation(accommodation);
-							int finalPoints = MainFrame.getPersonWhoLogin().getPoints() + (int) totalPrice;
-							MainFrame.getPersonWhoLogin().setPoints(finalPoints);
-							CustomerDAO.updatePoints(finalPoints, finalPoints);
-							JPanel panel = new LobbySuite(myFrame);
-							myFrame.getContentPane().removeAll();
-							myFrame.getContentPane().add(panel);
-							myFrame.getContentPane().validate();
-							myFrame.getContentPane().repaint();
-
-							int option1 = JOptionPane.showConfirmDialog(
-									myFrame, "Thank you for booking with us!",
-									"Confirmation", JOptionPane.PLAIN_MESSAGE);
-						} catch (SQLException e1) {
-							e1.printStackTrace();
+					noOfDays = 0;
+					room = (int) spinner.getValue();
+					if (suite != null) {
+						if (suite.equals("Orchid Suite")) {
+							getSuitePrice = 100;
+						} else if (suite.equals("Gold Suite")) {
+							getSuitePrice = 200;
+						} else if (suite.equals("Sands Suite")) {
+							getSuitePrice = 300;
+						} else if (suite.equals("Deluxe Suite")) {
+							getSuitePrice = 400;
+						} else if (suite.equals("Presidential Suite")) {
+							getSuitePrice = 500;
 						}
 					}
-				};
+					from = dateChooser_From.getCalendar();
+					to = dateChooser_To.getCalendar();
+
+					if (to != null && from != null) {
+						if (to.before(from) == true) {
+							checkDate = false;
+							int option = JOptionPane.showConfirmDialog(myFrame,
+									"Please pick the correct date!",
+									"Confirmation", JOptionPane.PLAIN_MESSAGE);
+						}
+
+						else if (to.before(from) == false) {
+
+							c = from;
+							while (c.before(to)) {
+								noOfDays++;
+								c.add(Calendar.DATE, 1);
+							}
+							System.out.println("No of days" + noOfDays);
+							checkDate = true;
+							totalDate = (to.getTime().getDate() + 2)
+									- (from.getTime().getDate() + 1);
+						}
+					}
+					// Calculate price 1st
+					if (checkDate) {
+						totalPrice = calculatePrice(getSuitePrice, noOfDays,
+								comboBox_Room.getSelectedIndex() + 1);
+						// Price then will show on the confirmation dialog
+						int option = JOptionPane.showConfirmDialog(myFrame,
+								"Are you sure you want to book "
+										+ (String) suite + "\n" + "Days: "
+										+ noOfDays + "\n" + "Rooms: " + room
+										+ "\n" + "Price: $" + totalPrice + "?",
+								"Confirmation", JOptionPane.YES_NO_OPTION);
+
+						Date date = new Date();
+						Calendar c = Calendar.getInstance();
+						c.setTime(date);
+						c.add(Calendar.DATE, day);
+						// checkOut = timeFormat.format(c.getTime());
+						checkOut = dateChooser_To.getDate().toString();
+						if (option == JOptionPane.YES_OPTION) {
+							AccommodationsEntity accommodation = new AccommodationsEntity(
+									MainFrame.getPersonWhoLogin().getId(),
+									suite, noOfDays, room, totalPrice,
+									checkOut, "A1");
+							try {
+								AccommodationsDAO
+										.createAccommodation(accommodation);
+								int finalPoints = MainFrame.getPersonWhoLogin()
+										.getPoints() + (int) totalPrice;
+								MainFrame.getPersonWhoLogin().setPoints(
+										finalPoints);
+								CustomerDAO.updatePoints(finalPoints,
+										finalPoints);
+								JPanel panel = new LobbySuite(myFrame);
+								myFrame.getContentPane().removeAll();
+								myFrame.getContentPane().add(panel);
+								myFrame.getContentPane().validate();
+								myFrame.getContentPane().repaint();
+
+								int option1 = JOptionPane.showConfirmDialog(
+										myFrame,
+										"Thank you for booking with us!",
+										"Confirmation",
+										JOptionPane.PLAIN_MESSAGE);
+							} catch (SQLException e1) {
+								e1.printStackTrace();
+							}
+						}
+					}
+					;
+				}
 			});
 		}
 		return jButtonDone1;
@@ -531,51 +612,27 @@ public class Accommodations extends JPanel {
 		return totalPrice;
 	}
 
-	private int checkOut(int checkOut) {
-
-		checkOut = comboBox_Day.getSelectedIndex() + 1 + 1;
-		return checkOut;
-	}
-
-	private JComboBox getComboBox_Day() {
-		if (comboBox_Day == null) {
-			comboBox_Day = new JComboBox();
-			comboBox_Day.addMouseListener(new MouseAdapter() {
-				public void mouseClicked(MouseEvent e) {
-					getDay = comboBox_Day.getSelectedIndex();
-					switch (getDay) {
-					case 0:
-						day = 1;
-						break;
-					case 1:
-						day = 2;
-						break;
-					case 2:
-						day = 3;
-						break;
-					case 3:
-						day = 4;
-						break;
-					case 4:
-						day = 5;
-						break;
-					default:
-						day = 1;
-						break;
-					}
-				}
-			});
-			comboBox_Day.setFont(new Font("Arial", Font.PLAIN, 14));
-			comboBox_Day.setModel(new DefaultComboBoxModel(new String[] { "1",
-					"2", "3", "4", "5" }));
-			comboBox_Day.setBounds(440, 235, 50, 23);
-		}
-		return comboBox_Day;
-	}
+	/*
+	 * private int checkOut(int checkOut) {
+	 * 
+	 * checkOut = comboBox_Day.getSelectedIndex() + 1 + 1; return checkOut; }
+	 * 
+	 * private JComboBox getComboBox_Day() { if (comboBox_Day == null) {
+	 * comboBox_Day = new JComboBox(); comboBox_Day.addMouseListener(new
+	 * MouseAdapter() { public void mouseClicked(MouseEvent e) { getDay =
+	 * comboBox_Day.getSelectedIndex(); switch (getDay) { case 0: day = 1;
+	 * break; case 1: day = 2; break; case 2: day = 3; break; case 3: day = 4;
+	 * break; case 4: day = 5; break; default: day = 1; break; } } });
+	 * comboBox_Day.setFont(new Font("Arial", Font.PLAIN, 14));
+	 * comboBox_Day.setModel(new DefaultComboBoxModel(new String[] { "1", "2",
+	 * "3", "4", "5" })); comboBox_Day.setBounds(291, 245, 50, 23); } return
+	 * comboBox_Day; }
+	 */
 
 	private JComboBox getComboBox_Room() {
 		if (comboBox_Room == null) {
 			comboBox_Room = new JComboBox();
+			comboBox_Room.setVisible(false);
 			comboBox_Room.addMouseListener(new MouseAdapter() {
 				public void mouseClicked(MouseEvent arg0) {
 					getRoom = comboBox_Room.getSelectedIndex();
@@ -623,7 +680,7 @@ public class Accommodations extends JPanel {
 		if (jLabelPrice == null) {
 			jLabelPrice = new JLabel("");
 			jLabelPrice.setFont(new Font("Calibri", Font.BOLD, 34));
-			jLabelPrice.setBounds(440, 455, 80, 28);
+			jLabelPrice.setBounds(732, 327, 80, 28);
 			jLabelPrice.setVisible(true);
 		}
 		return jLabelPrice;

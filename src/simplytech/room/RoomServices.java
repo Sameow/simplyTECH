@@ -20,6 +20,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Calendar;
 
 public class RoomServices extends JPanel {
 
@@ -39,6 +40,9 @@ public class RoomServices extends JPanel {
 	private String s;
 	private String username;
 	private int id;
+	private Calendar calendar;
+	private long start;
+	private long stop;
 
 	public String getService() {
 		return service;
@@ -290,14 +294,24 @@ public class RoomServices extends JPanel {
 		jLabelBack.setIcon(new ImageIcon(RoomServices.class
 				.getResource("/simplytech/image/Swap Left.png")));
 		jLabelBack.addMouseListener(new java.awt.event.MouseAdapter() {
-			public void mouseClicked(java.awt.event.MouseEvent e) {
-				// System.out.println("mouseClicked()"); // TODO Auto-generated
-				// Event stub mouseClicked()
-				JPanel panel = new Services(myFrame);
-				myFrame.getContentPane().removeAll();
-				myFrame.getContentPane().add(panel);
-				myFrame.getContentPane().validate();
-				myFrame.getContentPane().repaint();
+			public void mousePressed(MouseEvent e) {
+				start = calendar.getInstance().getTimeInMillis();
+			}
+			public void mouseReleased(MouseEvent arg0) {
+				stop = calendar.getInstance().getTimeInMillis();
+				if (stop - start < 500) {
+					JPanel panel = new Services(myFrame);
+					myFrame.getContentPane().removeAll();
+					myFrame.getContentPane().add(panel);
+					myFrame.getContentPane().validate();
+					myFrame.getContentPane().repaint();
+				} else {
+					JPanel panel = new RoomHomePagePanel(myFrame);
+					myFrame.getContentPane().removeAll();
+					myFrame.getContentPane().add(panel);
+					myFrame.getContentPane().validate();
+					myFrame.getContentPane().repaint();
+				}
 			}
 		});
 		jLabelRoomServices = new JLabel();

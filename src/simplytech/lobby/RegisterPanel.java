@@ -18,6 +18,8 @@ import java.awt.event.KeyEvent;
 import javax.swing.SwingConstants;
 import java.awt.Point;
 import java.text.ParseException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 import javax.swing.ButtonGroup;
@@ -481,12 +483,27 @@ public class RegisterPanel extends JPanel {
 						checkAddress = true;
 					}
 					String email = jTextFieldEmail.getText();
-					boolean checkEmail = false;
-					if (jTextFieldEmail.getText().equals("")){
-						errorMessage.setText(errorMessage.getText() + "*Email must not be left blank.\n");
-						checkEmail = false;
+					Pattern validEmailFormat = Pattern.compile(".+@.+\\.[a-z]+");
+					Matcher matchEmail = validEmailFormat.matcher(email);
+					boolean checkEmailFormat = matchEmail.matches();
+					if (!(matchEmail.matches())){
+						errorMessage.setText(errorMessage.getText() + "*Invalid email type. \n");
+						checkEmailFormat = false;
 					}
 					else{
+						checkEmailFormat = true;
+					}
+					boolean checkEmailEmpty = false;
+					boolean checkEmail = false;
+					
+					if (jTextFieldEmail.getText().equals("")){
+						errorMessage.setText(errorMessage.getText() + "*Email must not be left blank.\n");
+						checkEmailEmpty = false;
+					}
+					else{
+						checkEmailEmpty = true;
+					} 
+					if (checkEmailFormat == true && checkEmailEmpty == true){
 						checkEmail = true;
 					}
 				
@@ -644,7 +661,8 @@ public class RegisterPanel extends JPanel {
 	}
 	private JFormattedTextField getFormattedTextFieldMobilePhone() throws ParseException {
 		if (formattedTextFieldMobilePhone == null) {
-			formattedTextFieldMobilePhone = new JFormattedTextField();
+			MaskFormatter formatter = new MaskFormatter("##########");
+			formattedTextFieldMobilePhone = new JFormattedTextField(formatter);
 			formattedTextFieldMobilePhone.setBounds(653, 246, 127, 20);
 			formattedTextFieldMobilePhone.setLocation(new Point(643, 213));
 			formattedTextFieldMobilePhone.setSize(new Dimension(117, 22));

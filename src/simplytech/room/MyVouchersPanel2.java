@@ -1,5 +1,6 @@
 package simplytech.room;
 
+import javax.management.timer.Timer;
 import javax.swing.JPanel;
 import java.awt.Dimension;
 import javax.swing.JTextPane;
@@ -22,6 +23,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -64,6 +67,10 @@ public class MyVouchersPanel2 extends JPanel {
 	private String previousPanel = null;
 	private String voucherType = null;
 	private int vouchersId;
+	private Timer timer = new Timer();
+	private Calendar calendar;
+	private long start;
+	private long stop;
 
 	/**
 	 * This is the default constructor
@@ -94,20 +101,36 @@ public class MyVouchersPanel2 extends JPanel {
 		jLabelBack.setIcon(new ImageIcon(getClass().getResource(
 				"/simplyTECH/image/Swap Left.png")));
 		jLabelBack.addMouseListener(new java.awt.event.MouseAdapter() {
-			public void mouseClicked(java.awt.event.MouseEvent e) {
-				JPanel panel = new MyAccountsPanel(myFrame);
-				if (previousPanel == "RedemptionPanel") {
-					panel = new RedemptionPanel(myFrame, voucherType);
-				} else if (previousPanel == "MyAccountsPanel") {
-					panel = new MyAccountsPanel(myFrame);
-				} else if (previousPanel == "MyAccountsPanel2") {
-					panel = new MyAccountsPanel2(myFrame);
-				}
-				myFrame.getContentPane().removeAll();
-				myFrame.getContentPane().add(panel);
-				myFrame.getContentPane().validate();
-				myFrame.getContentPane().repaint();
+			public void mousePressed(MouseEvent e) {
+				start = calendar.getInstance().getTimeInMillis();			
 			}
+			@Override
+			public void mouseReleased(MouseEvent arg0) {
+				stop = calendar.getInstance().getTimeInMillis();
+				if (stop - start < 500){
+					JPanel panel = new MyAccountsPanel(myFrame);
+					if (previousPanel == "RedemptionPanel") {
+						panel = new RedemptionPanel(myFrame, voucherType);
+					} else if (previousPanel == "MyAccountsPanel") {
+						panel = new MyAccountsPanel(myFrame);
+					} else if (previousPanel == "MyAccountsPanel2") {
+						panel = new MyAccountsPanel2(myFrame);
+					}
+					myFrame.getContentPane().removeAll();
+					myFrame.getContentPane().add(panel);
+					myFrame.getContentPane().validate();
+					myFrame.getContentPane().repaint();
+				}
+				else {
+					JPanel panel = new RoomHomePagePanel(myFrame);
+					myFrame.getContentPane().removeAll();
+					myFrame.getContentPane().add(panel);
+					myFrame.getContentPane().validate();
+					myFrame.getContentPane().repaint();	
+				}
+					
+			}
+			
 		});
 		jLabelImage = new JLabel();
 		jLabelImage.setBounds(new Rectangle(578, 123, 111, 114));

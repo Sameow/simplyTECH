@@ -10,8 +10,6 @@ import java.sql.Statement;
 import simplytech.entity.Menu;
 import simplytech.databasestatements.DBConnectionManager;
 
-
-
 public class MenuDAO {
 
 	static Connection currentCon = null;
@@ -38,19 +36,19 @@ public class MenuDAO {
 				int id2 = rs.getInt("id");
 				String username = rs.getString("username");
 				int quantity = rs.getInt("quantity");
-				String code = rs.getString("code");
 				String item = rs.getString("item");
 				double totalPrice = rs.getDouble("totalPrice");
 				int points = rs.getInt("points");
+				int menuID = rs.getInt(getMax());
 
 				menu = new Menu();
 				menu.setId(id2);
 				menu.setUsername(username);
 				menu.setQuantity(quantity);
-				menu.setCode(code);
 				menu.setItem(item);
 				menu.setTotalPrice(totalPrice);
 				menu.setPoints(points);
+				menu.setMenuID(menuID);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -77,19 +75,19 @@ public class MenuDAO {
 				int id2 = rs.getInt("id");
 				String username = rs.getString("username");
 				int quantity = rs.getInt("quantity");
-				String code = rs.getString("code");
 				String item = rs.getString("item");
 				double totalPrice = rs.getDouble("totalPrice");
 				int points = rs.getInt("points");
+				int menuID = rs.getInt(getMax());
 
 				menu = new Menu();
 				menu.setId(id2);
 				menu.setUsername(username);
 				menu.setQuantity(quantity);
-				menu.setCode(code);
 				menu.setItem(item);
 				menu.setTotalPrice(totalPrice);
 				menu.setPoints(points);
+				menu.setMenuID(menuID);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -105,10 +103,10 @@ public class MenuDAO {
 				"jdbc:mysql://localhost:8888/simplytech", "simplyTECH",
 				"hahaudie");
 		stmt = con.createStatement();
-		String query = "SELECT MAX(MenuID) FROM menu";
+		String query = "SELECT MAX(menuID) FROM menu";
 		ResultSet rs = stmt.executeQuery(query);
 		while (rs.next()) {
-			count = rs.getInt("MAX(MenuID)");
+			count = rs.getInt("MAX(menuID)");
 		}
 		return count;
 	}
@@ -124,17 +122,17 @@ public class MenuDAO {
 			stmt = currentCon.createStatement();
 
 			// query for inserting into the table
-			String query = "insert into menu(code,item,quantity,totalPrice, points, username, id) values(?,?,?,?,?,?,?)";
+			String query = "insert into menu(item,quantity,totalPrice, points, username, id,menuID) values(?,?,?,?,?,?,?,?)";
 			pstmt = currentCon.prepareStatement(query);
 
 			// inserting values
-			pstmt.setString(1, menu.getCode());
-			pstmt.setString(2, menu.getItem());
-			pstmt.setInt(3, menu.getQuantity());
-			pstmt.setDouble(4, menu.getTotalPrice());
-			pstmt.setInt(5, menu.getPoints());
-			pstmt.setString(6, menu.getUsername());
-			pstmt.setInt(7, menu.getId());
+			pstmt.setString(1, menu.getItem());
+			pstmt.setInt(2, menu.getQuantity());
+			pstmt.setDouble(3, menu.getTotalPrice());
+			pstmt.setInt(4, menu.getPoints());
+			pstmt.setString(5, menu.getUsername());
+			pstmt.setInt(6, menu.getId());
+			pstmt.setInt(7, menu.getMenuID());
 			pstmt.executeUpdate();
 
 		} catch (Exception ex) {
